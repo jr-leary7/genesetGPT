@@ -16,7 +16,7 @@ def fetch_canonical_protein_product(ensembl_id: str, sleep_interval: float = 1.0
     Parameters
     ----------
     ensembl_id : str 
-        A string specifying the Ensembl ID of the gene of interest. Defaults to None.
+        A string specifying the Ensembl ID of the gene of interest.
     sleep_interval : float
         A float specifying how long the UniProt request should be left to wait before fetching results. Defaults to 1. 
 

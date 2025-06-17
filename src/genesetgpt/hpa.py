@@ -14,7 +14,7 @@ def fetch_HPA_data(ensembl_id: str) -> HPAData:
     Parameters
     ----------
     ensembl_id : str
-        A string specifying the Ensembl ID for which data will be scraped. Defaults to None. 
+        A string specifying the Ensembl ID for which data will be scraped. 
 
     Returns
     -------
