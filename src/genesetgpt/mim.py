@@ -1,6 +1,7 @@
 import re 
 import time 
 import requests
+import xmltodict 
 import pandas as pd
 from typing import TypedDict, Optional
 from .utils import add_trailing_period 
