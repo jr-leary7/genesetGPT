@@ -1,16 +1,17 @@
 import pandas as pd
 from .hpa import fetch_HPA_data
 from .mim import fetch_mim_summary 
-from .utils import add_trailing_period 
 from .entrez import fetch_entrez_summary 
 from .uniprot import fetch_uniprot_summary
+from .utils import add_trailing_period, get_aliases
 
 def build_user_prompt(ensembl_id: str, 
                       hgnc_symbol: str, 
                       entrez_id: str, 
                       entrez_email: str, 
                       mim_mapping_table: pd.DataFrame, 
-                      mim_api_key: str) -> str: 
+                      mim_api_key: str, 
+                      include_aliases: bool = True) -> str: 
     """
     Generate a user prompt for a given gene. 
 
@@ -35,6 +36,12 @@ def build_user_prompt(ensembl_id: str,
         A (long) string containing the generated user prompt. 
 
     """
+    if include_aliases: 
+        gene_aliases = get_aliases(hgnc_symbol=hgnc_symbol)
+        if gene_aliases['aliases'] is not None:
+            gene_aliases = ', '.join(gene_aliases['aliases'])
+        else: 
+            gene_aliases = None
     hpa_data = fetch_HPA_data(ensembl_id=ensembl_id)
     go_bp_terms = hpa_data['go_bp_terms']
     diseases = hpa_data['diseases']
@@ -58,8 +65,12 @@ def build_user_prompt(ensembl_id: str,
     else: 
         mim_summary = mim_info['mim_summary'][0]
     prompt_user = f'I have collected several functional summaries concerning the human gene {hgnc_symbol}'
-    prompt_user+= f' (Ensembl ID {ensembl_id}). '
-    prompt_user += 'Please coalesce the various summaries into a single 3-5 sentence description of the function of the gene. In addition, please provide a score from 0-1 specifying how confident you are in your summarization. '
+    prompt_user += f' (Ensembl ID {ensembl_id}, Entrez ID {entrez_id}). '
+    if gene_aliases is not None:
+        prompt_user += 'Known aliases for this gene include: '
+        prompt_user += gene_aliases
+        prompt_user += '. '
+    prompt_user += 'Please coalesce the various summaries into a single 3-5 sentence description of the function of the gene. In addition, please provide a score ranging from 0-1 specifying how confident you are in your summarization. '
     if go_bp_terms is not None:
         prompt_user += 'According to the Human Protein Atlas (HPA) the Gene Ontology Biological Process (GO:BP) terms this gene is involved in are: '
         prompt_user += go_bp_terms

@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 from .geneids import fetch_gene_table
 from .hpa import fetch_HPA_data
@@ -7,7 +7,7 @@ from .entrez import fetch_entrez_summary
 from .mim import fetch_mim_table, fetch_mim_summary 
 from .prompt import build_user_prompt
 from .llm import summarize_genes, get_embedding 
-from .utils import add_trailing_period, cosine_sim
+from .utils import add_trailing_period, cosine_sim, get_aliases
 
 __all__ = [
     'fetch_gene_table', 
@@ -22,5 +22,6 @@ __all__ = [
     'summarize_genes', 
     'get_embedding', 
     'add_trailing_period', 
-    'cosine_sim'
+    'cosine_sim', 
+    'get_aliases'
 ]
