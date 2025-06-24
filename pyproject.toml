@@ -1,10 +1,11 @@
 [project]
 name = "genesetgpt"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.1"
+description = "This package allows users to summarize gene sets using LLMs."
 readme = "README.md"
 authors = [
-    { name = "Jack Leary", email = "j.leary@ufl.edu" }
+    { name = "Jack R. Leary", email = "j.leary@ufl.edu" }, 
+    { name = "Samantha Pattey", email = "samanthapattey@ufl.edu" }
 ]
 requires-python = ">=3.12"
 dependencies = [
