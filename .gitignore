@@ -8,3 +8,7 @@ __pycache__/
 
 # MacOS files
 *.DS_Store
+
+# marimo files
+__marimo__
+notebooks/__marimo__
