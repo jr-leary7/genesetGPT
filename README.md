@@ -34,6 +34,14 @@ Additionally, you can build the package for deployment using `uv`:
 uv build 
 ```
 
+# Example notebooks
+
+In the `notebooks/` directory there are several [`marimo` notebooks](https://marimo.io) (a drop-in replacement for Jupyter notebooks that stores everything as pure Python code) demonstrating how to use the package. To run e.g., the spatial case study notebook run the following in your terminal:
+
+```bash
+marimo edit notebooks/spatial_case_study.py
+```
+
 # Contact information
 
 If you encounter any issues with the package or need assistance in performing your analysis, please [open an issue](https://github.com/jr-leary7/genesetGPT/issues) or reach out [via email](mailto:j.leary@ufl.edu). 
