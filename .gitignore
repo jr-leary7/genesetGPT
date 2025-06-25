@@ -12,3 +12,6 @@ __pycache__/
 # marimo files
 __marimo__
 notebooks/__marimo__
+
+# SQL files
+*.pybiomart.sqlite
