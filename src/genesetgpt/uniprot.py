@@ -9,7 +9,9 @@ class CanonicalProteinProduct(TypedDict):
     ensembl_id: str
     canonical_protein_product: str 
 
-def fetch_canonical_protein_product(ensembl_id: str, sleep_interval: float = 1.0) -> CanonicalProteinProduct:
+def fetch_canonical_protein_product(ensembl_id: str, 
+                                    poll_interval: float = 0.5, 
+                                    max_wait: float = 30.0) -> CanonicalProteinProduct:
     """
     Identify the canonical protein product of a given gene. 
 
@@ -17,8 +19,10 @@ def fetch_canonical_protein_product(ensembl_id: str, sleep_interval: float = 1.0
     ----------
     ensembl_id : str 
         A string specifying the Ensembl ID of the gene of interest.
-    sleep_interval : float
-        A float specifying how long the UniProt request should be left to wait before fetching results. Defaults to 1. 
+    poll_interval : float
+        A float specifying how long the process should sleep between polling the request. Defaults to 0.5 seconds.
+    max_wait : float
+        A float specifying the maximum amount of time to wait for the request to complete. Defaults to 30 seconds.
 
     Returns
     -------
@@ -30,7 +34,19 @@ def fetch_canonical_protein_product(ensembl_id: str, sleep_interval: float = 1.0
         dest='UniProtKB', 
         ids=[ensembl_id]
     )
-    time.sleep(sleep_interval)
+    waited = 0.0
+    while True:
+        status = request.get_status()
+        if status == 'FINISHED':
+            break
+        elif waited >= max_wait:
+            res = {
+                'ensembl_id': ensembl_id, 
+                'canonical_protein_product': None
+            }
+            return res
+        time.sleep(poll_interval)
+        waited += poll_interval
     res = list(request.each_result())
     if len(res) == 0:
         res = {

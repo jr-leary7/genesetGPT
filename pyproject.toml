@@ -11,8 +11,7 @@ requires-python = ">=3.12"
 dependencies = [
     "biopython>=1.85",
     "cellrank>=2.0.7",
-    "dotenv>=0.9.9",
-    "marimo>=0.15.2",
+    "marimo>=0.18.1",
     "openai>=1.86.0",
     "pandarallel>=1.6.5",
     "pybiomart>=0.2.0",
