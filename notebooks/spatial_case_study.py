@@ -1,18 +1,16 @@
 import marimo
 
-__generated_with = "0.13.15"
+__generated_with = "0.18.1"
 app = marimo.App(width="medium")
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     # Libraries
 
     Here we import all the packages we'll need to load our data and perform our analysis.
-    """
-    )
+    """)
     return
 
 
@@ -91,13 +89,11 @@ def _(load_dotenv):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-    # Data 
+    mo.md(r"""
+    # Data
 
     Here we load in a 10X Genomics Visium dataset containing a slice of the human cerebral cortex ([source](https://cf.10xgenomics.com/samples/spatial-exp/1.1.0/V1_Human_Brain_Section_1/V1_Human_Brain_Section_1_web_summary.html)).
-    """
-    )
+    """)
     return
 
 
@@ -113,7 +109,9 @@ def _(sq):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Since downloading the dataset using `squidpy` creates a cache directory called `data/` in our current directory, we remove it (if the directory exists). This is done because we don't want to accidentally commit a large data file to our GitHub repository.""")
+    mo.md(r"""
+    Since downloading the dataset using `squidpy` creates a cache directory called `data/` in our current directory, we remove it (if the directory exists). This is done because we don't want to accidentally commit a large data file to our GitHub repository.
+    """)
     return
 
 
@@ -129,15 +127,13 @@ def _(os, shutil):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-    # Analysis 
+    mo.md(r"""
+    # Analysis
 
     ## Preprocessing the spatial data
 
     We start by performing some basic spot- and gene-level QC.
-    """
-    )
+    """)
     return
 
 
@@ -150,7 +146,9 @@ def _(ad_brain, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We continue by identifying a set of 3,000 naive HVGs.""")
+    mo.md(r"""
+    We continue by identifying a set of 3,000 naive HVGs.
+    """)
     return
 
 
@@ -167,7 +165,9 @@ def _(ad_brain, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Next, we depth-normalize and log1p-transform the raw counts.""")
+    mo.md(r"""
+    Next, we depth-normalize and log1p-transform the raw counts.
+    """)
     return
 
 
@@ -181,7 +181,9 @@ def _(ad_brain, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Moving on, we scaled the normalized counts and run PCA using our HVG set.""")
+    mo.md(r"""
+    Moving on, we scaled the normalized counts and run PCA using our HVG set.
+    """)
     return
 
 
@@ -199,7 +201,9 @@ def _(ad_brain, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""In PCA space we identify a shared nearest-neighbors (SNN) graph with $k = 20$ neighbors per spot. We then partition the graph into clusters using the Leiden algorithm.""")
+    mo.md(r"""
+    In PCA space we identify a shared nearest-neighbors (SNN) graph with $k = 20$ neighbors per spot. We then partition the graph into clusters using the Leiden algorithm.
+    """)
     return
 
 
@@ -225,7 +229,9 @@ def _(ad_brain, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Here we plot the first two dimensions of the PCA embedding, with spots colored by Leiden cluster ID. """)
+    mo.md(r"""
+    Here we plot the first two dimensions of the PCA embedding, with spots colored by Leiden cluster ID.
+    """)
     return
 
 
@@ -249,7 +255,9 @@ def _(ad_brain, plt, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Now we run UMAP to further reduce dimensionality down to 2D for visualization purposes.""")
+    mo.md(r"""
+    Now we run UMAP to further reduce dimensionality down to 2D for visualization purposes.
+    """)
     return
 
 
@@ -261,7 +269,9 @@ def _(ad_brain, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We plot the clustering on the UMAP embedding\:""")
+    mo.md(r"""
+    We plot the clustering on the UMAP embedding\:
+    """)
     return
 
 
@@ -285,7 +295,9 @@ def _(ad_brain, plt, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""When plotting the clustering on the spatial coordinates, we see clear layers\:""")
+    mo.md(r"""
+    When plotting the clustering on the spatial coordinates, we see clear layers\:
+    """)
     return
 
 
@@ -305,7 +317,9 @@ def _(ad_brain, plt, sq):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Now we identify a set of spatial neighbors for every spot with $k = 10$.""")
+    mo.md(r"""
+    Now we identify a set of spatial neighbors for every spot with $k = 10$.
+    """)
     return
 
 
@@ -317,7 +331,9 @@ def _(ad_brain, sq):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Using the naive HVG set of 3,000 genes, we test for spatial autocorrelation via [Moran's I test](https://en.wikipedia.org/wiki/Moran%27s_I).""")
+    mo.md(r"""
+    Using the naive HVG set of 3,000 genes, we test for spatial autocorrelation via [Moran's I test](https://en.wikipedia.org/wiki/Moran%27s_I).
+    """)
     return
 
 
@@ -339,7 +355,9 @@ def _(ad_brain, sq):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""After filtering out genes with adjusted *p*-values greater than 0.05, we identify the top 500 most spatially variable genes. We also add a Boolean flag to our `AnnData` object specifying which genes are classified as SVGs.""")
+    mo.md(r"""
+    After filtering out genes with adjusted *p*-values greater than 0.05, we identify the top 500 most spatially variable genes. We also add a Boolean flag to our `AnnData` object specifying which genes are classified as SVGs.
+    """)
     return
 
 
@@ -361,7 +379,9 @@ def _(ad_brain):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Next, we extract the normalized counts matrix for the SVGs and scale it.""")
+    mo.md(r"""
+    Next, we extract the normalized counts matrix for the SVGs and scale it.
+    """)
     return
 
 
@@ -375,7 +395,9 @@ def _(StandardScaler, ad_brain, top500_svgs):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""With the scaled SVG matrix in hand, we run PCA and reduce dimensionality down to 30 components.""")
+    mo.md(r"""
+    With the scaled SVG matrix in hand, we run PCA and reduce dimensionality down to 30 components.
+    """)
     return
 
 
@@ -388,7 +410,9 @@ def _(PCA, expr_mtx_scaled):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""The next step is to create a *k* nearest-neighbors (KNN) graph with $k = 20$ neighbors per gene, after which we convert it to an undirected adjacency matrix, which we then partition into clusters using the Leiden algorithm.""")
+    mo.md(r"""
+    The next step is to create a *k* nearest-neighbors (KNN) graph with $k = 20$ neighbors per gene, after which we convert it to an undirected adjacency matrix, which we then partition into clusters using the Leiden algorithm.
+    """)
     return
 
 
@@ -405,7 +429,9 @@ def _(NearestNeighbors, ig, np, pc_mtx):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Finally, we create a `DataFrame` of the gene-to-cluster assignments.""")
+    mo.md(r"""
+    Finally, we create a `DataFrame` of the gene-to-cluster assignments.
+    """)
     return
 
 
@@ -420,7 +446,9 @@ def _(np, partition, pd, top500_svgs):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We extract lists of the genes assigned to each cluster, which we'll use to perform gene set scoring. """)
+    mo.md(r"""
+    We extract lists of the genes assigned to each cluster, which we'll use to perform gene set scoring.
+    """)
     return
 
 
@@ -434,7 +462,9 @@ def _(cluster_df):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""For each SVG cluster we perform gene set scoring using [`sc.tl.score_genes()`](https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.score_genes.html), which adds a column to `.obs` with a measurement of how highly-expressed the gene set is compared to a randomly sampled background. """)
+    mo.md(r"""
+    For each SVG cluster we perform gene set scoring using [`sc.tl.score_genes()`](https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.score_genes.html), which adds a column to `.obs` with a measurement of how highly-expressed the gene set is compared to a randomly sampled background.
+    """)
     return
 
 
@@ -466,7 +496,9 @@ def _(ad_brain, genes_clust0, genes_clust1, genes_clust2, sc):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We plot the gene set scores for each SVG cluster below\:""")
+    mo.md(r"""
+    We plot the gene set scores for each SVG cluster below\:
+    """)
     return
 
 
@@ -498,13 +530,11 @@ def _(ad_brain, plt, sq):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-    ## LLM Summarization 
+    mo.md(r"""
+    ## LLM Summarization
 
-    To summarize our gene sets using LLMs we'll need some other data sources. We start by using our `geneSetGPT` package to retrieve a table containing various IDs for all the genes in the human genome. 
-    """
-    )
+    To summarize our gene sets using LLMs we'll need some other data sources. We start by using our `geneSetGPT` package to retrieve a table containing various IDs for all the genes in the human genome.
+    """)
     return
 
 
@@ -517,7 +547,9 @@ def _(gpt):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Next, we use our package to fetch a table containing a mapping from Mendelian Inheritance of Man (MIM) IDs to other gene IDs. """)
+    mo.md(r"""
+    Next, we use our package to fetch a table containing a mapping from Mendelian Inheritance of Man (MIM) IDs to other gene IDs.
+    """)
     return
 
 
@@ -530,7 +562,9 @@ def _(gpt):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We filter our human gene ID table to include just the SVG set\:""")
+    mo.md(r"""
+    We filter our human gene ID table to include just the SVG set\:
+    """)
     return
 
 
@@ -544,7 +578,9 @@ def _(all_hs_genes):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Now we put it all together and add the user prompt for each gene to the `DataFrame` containing our SVG gene information, complete with parallelism and a progress bar - both powered by the `pandarallel` package. **Note**: this will take a while since we're iterating over 500+ genes (hence the parallel processing and progress bar).""")
+    mo.md(r"""
+    Now we put it all together and add the user prompt for each gene to the `DataFrame` containing our SVG gene information, complete with parallelism and a progress bar - both powered by the `pandarallel` package. **Note**: this will take a while since we're iterating over 500+ genes (hence the parallel processing and progress bar).
+    """)
     return
 
 
@@ -578,7 +614,9 @@ def _(gpt, mim_table, os, svg_gene_ids):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Let's take a look at the dataset annotated with user prompts\:""")
+    mo.md(r"""
+    Let's take a look at the dataset annotated with user prompts\:
+    """)
     return
 
 
@@ -596,7 +634,9 @@ def _(mo, svg_gene_ids):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We'll also need to write out the development prompt, which tells the model what kind of tone and style to adopt when generating answers.""")
+    mo.md(r"""
+    We'll also need to write out the development prompt, which tells the model what kind of tone and style to adopt when generating answers.
+    """)
     return
 
 
@@ -608,7 +648,9 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We set up our OpenAI client using our API key below\:""")
+    mo.md(r"""
+    We set up our OpenAI client using our API key below\:
+    """)
     return
 
 
@@ -620,7 +662,9 @@ def _(OpenAI, os):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We execute the prompts in parallel with 4 workers, since the process is I/O bound via HTTP requests.""")
+    mo.md(r"""
+    We execute the prompts in parallel with 4 workers, since the process is I/O bound via HTTP requests.
+    """)
     return
 
 
@@ -641,7 +685,9 @@ def _(ThreadPoolExecutor, client, gpt, partial, prompt_dev, svg_gene_ids):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We add the LLM summaries and confidence scores to our `DataFrame`.""")
+    mo.md(r"""
+    We add the LLM summaries and confidence scores to our `DataFrame`.
+    """)
     return
 
 
@@ -654,7 +700,9 @@ def _(llm_scores, llm_summaries, svg_gene_ids):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We define a short class for our gene set-level summaries.""")
+    mo.md(r"""
+    We define a short class for our gene set-level summaries.
+    """)
     return
 
 
@@ -669,7 +717,9 @@ def _(BaseModel):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Here we set up a `list` object containing our unique cluster IDs.""")
+    mo.md(r"""
+    Here we set up a `list` object containing our unique cluster IDs.
+    """)
     return
 
 
@@ -681,13 +731,11 @@ def _(cluster_df):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     Now we can iterate over our cluster IDs, set up the queries to the LLM, and generate responses containing 1) a summary of the gene set 2) a name for the gene set and 3) an estimated confidence score.
 
     We also repeat the summarization, naming, and scoring process *without* the additional functional context in order to perform a comparison.
-    """
-    )
+    """)
     return
 
 
@@ -766,7 +814,9 @@ def _(
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We create a `DataFrame` of the cluster-level summaries and associated metadata for both the context-aware and no-context methods, which we will save later.""")
+    mo.md(r"""
+    We create a `DataFrame` of the cluster-level summaries and associated metadata for both the context-aware and no-context methods, which we will save later.
+    """)
     return
 
 
@@ -798,7 +848,9 @@ def _(
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Let's take a look at the output\:""")
+    mo.md(r"""
+    Let's take a look at the output\:
+    """)
     return
 
 
@@ -816,7 +868,9 @@ def _(final_summary_no_context_df):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""We can print the individual cluster-level summaries to Markdown; we start with cluster 0\:""")
+    mo.md(r"""
+    We can print the individual cluster-level summaries to Markdown; we start with cluster 0\:
+    """)
     return
 
 
@@ -834,7 +888,9 @@ def _(final_summary_no_context_df, mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Next we compare the summaries for cluster 1\:""")
+    mo.md(r"""
+    Next we compare the summaries for cluster 1\:
+    """)
     return
 
 
@@ -852,7 +908,9 @@ def _(final_summary_no_context_df, mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Lastly we compare the summaries for cluster 2\:""")
+    mo.md(r"""
+    Lastly we compare the summaries for cluster 2\:
+    """)
     return
 
 
@@ -870,15 +928,13 @@ def _(final_summary_no_context_df, mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     ## Method comparison
 
     Of interest to us is whether or not our method of providing functional context to the LLM offers any improvement (and if so, how much) over simply querying the LLM with the gene set with no additional context.
 
     We loop over our two sets of summaries, generate embeddings, and compute the cosine similarity between the two embeddings.
-    """
-    )
+    """)
     return
 
 
@@ -899,7 +955,9 @@ def _(cluster_summaries, cluster_summaries_no_context, gpt):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""Overall the cosine similarities between the summaries are quite high - this indicates that another method of evaluating the differences between the two approaches is likely necessary.""")
+    mo.md(r"""
+    Overall the cosine similarities between the summaries are quite high - this indicates that another method of evaluating the differences between the two approaches is likely necessary.
+    """)
     return
 
 
@@ -911,13 +969,11 @@ def _(cosine_sims):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
+    mo.md(r"""
     # Save data
 
     Finally, we'll save all the data we generated.
-    """
-    )
+    """)
     return
 
 
@@ -948,7 +1004,9 @@ def _(json, model_jsons, model_jsons_no_context):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""# Session information""")
+    mo.md(r"""
+    # Session information
+    """)
     return
 
 
