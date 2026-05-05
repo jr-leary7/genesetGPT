@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
+from typing import Optional
 from pybiomart import Server
 
-def fetch_gene_table(sort_by: str = 'hgnc_symbol') -> pd.DataFrame: 
+def fetch_gene_table(sort_by: str = 'hgnc_symbol', alt_ensembl_archive: Optional[str] = None) -> pd.DataFrame: 
     """
     Fetch a table of gene IDs and other per-gene metadata. 
 
@@ -10,13 +11,18 @@ def fetch_gene_table(sort_by: str = 'hgnc_symbol') -> pd.DataFrame:
     ----------
     sort_by : str 
         A string specifying the gene ID to sort the table by. Defaults to 'hgnc_symbol'. 
+    alt_ensembl_archive : str 
+        An optional string specifying a date-specific alternative Ensembl archive URL to query e.g., 'http://www.sep2025.archive.ensembl.org' (the most recent archive as of this implementation). Try using this argument if the default Ensembl server times out or responds with an error. Defaults to None. 
 
     Returns
     -------
     gene_df : pd.DataFrame 
         A DataFrame containing gene IDs, biotypes, descriptions, and chromosomal locations. 
     """
-    server = Server(host='http://www.ensembl.org')
+    if alt_ensembl_archive is not None:
+        server = Server(host=alt_ensembl_archive)
+    else:
+        server = Server(host='http://www.ensembl.org')
     mart = server.marts['ENSEMBL_MART_ENSEMBL']
     dataset = mart.datasets['hsapiens_gene_ensembl']
     gene_df = dataset.query(
