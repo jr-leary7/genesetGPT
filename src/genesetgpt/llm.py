@@ -9,7 +9,7 @@ class GeneSummary(BaseModel):
 def summarize_genes(prompt_user: str, 
                     prompt_dev: str, 
                     openai_client: openai.OpenAI, 
-                    openai_model: str = 'gpt-4o-mini') -> tuple[str, float]:
+                    openai_model: str = 'gpt-5-mini') -> tuple[str, float]:
     """
     Summarize a gene given several functional summaries. 
 
@@ -22,7 +22,7 @@ def summarize_genes(prompt_user: str,
     openai_client : openai.OpenAI
         An object of class `OpenAI`. 
     openai_model : str
-        A string specifying the OpenAI model to use when generating the response. Defaults to 'gpt-4o-mini'. 
+        A string specifying the OpenAI model to use when generating the response. Defaults to 'gpt-5-mini'. 
 
     Returns
     -------
