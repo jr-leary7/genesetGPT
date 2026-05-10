@@ -1,8 +1,9 @@
 import re 
 import time 
-import requests
 import xmltodict 
 import pandas as pd
+from io import StringIO
+from curl_cffi import requests
 from typing import TypedDict, Optional
 from .utils import add_trailing_period 
 
@@ -20,11 +21,23 @@ def fetch_mim_table(sort_by: str = 'hgnc_symbol') -> pd.DataFrame:
     mim_mapping_df : pd.DataFrame 
         A DataFrame that specifies the relationships between MIM ID, Ensembl ID, Entrez ID, and HGNC symbol. 
     """
-    mim_mapping_df = pd.read_csv(
-        'https://www.omim.org/static/omim/data/mim2gene.txt', 
-        delimiter='\t', 
-        skiprows=4
+    headers = {
+        'Referer': 'https://www.omim.org/',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    }
+    response = requests.get(
+        url='https://www.omim.org/static/omim/data/mim2gene.txt', 
+        impersonate='chrome',
+        headers=headers
     )
+    if response.status_code == 200:
+        mim_mapping_df = pd.read_csv(
+            filepath_or_buffer=StringIO(response.text), 
+            delimiter='\t', 
+            skiprows=4
+        )
+    else: 
+        raise ValueError(f'The returned HTTP status code was: {response.status_code}')
     mim_mapping_df.drop_duplicates(inplace=True)
     mim_mapping_df.rename(
         columns={
