@@ -1,3 +1,5 @@
+import openai
+import pandarallel
 import pandas as pd
 from .hpa import fetch_HPA_data
 from .mim import fetch_mim_summary 
@@ -88,3 +90,31 @@ def build_user_prompt(ensembl_id: str,
         prompt_user += entrez_summary['entrez_summary']
     prompt_user = add_trailing_period(text=prompt_user)
     return prompt_user
+
+def build_prompt_df(gene_list: list, 
+                    gene_id_table: pd.DataFrame, 
+                    mim_mapping_table: pd.DataFrame, 
+                    mim_api_key: str = None, 
+                    n_cores: int = 2, 
+                    progress_bar: bool = True) -> pd.DataFrame:
+    gene_id_table = gene_id_table.query(expr='hgnc_symbol in @gene_list').copy()
+    gene_id_table.dropna(inplace=True)
+    pandarallel.initialize(
+        progress_bar=progress_bar, 
+        nb_workers=n_cores, 
+        verbose=0
+    )
+    gene_id_table['prompt_user'] = gene_id_table.parallel_apply(
+        lambda row: 
+        build_user_prompt(
+            ensembl_id=row['ensembl_id'], 
+            hgnc_symbol=row['hgnc_symbol'], 
+            entrez_id=row['entrez_id'], 
+            entrez_email='j.leary@ufl.edu', 
+            mim_mapping_table=mim_mapping_table, 
+            mim_api_key=mim_api_key, 
+            include_aliases=True
+        ), 
+        axis=1
+    )
+    return gene_id_table
