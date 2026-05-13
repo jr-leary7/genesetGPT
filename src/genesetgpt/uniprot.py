@@ -115,14 +115,14 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
         uniprot_url = 'https://rest.uniprot.org/uniprotkb/search?&query=accession:'
         uniprot_url += uniprot_id
         uniprot_url += '&organism_id=9606&format=json'
-        uniprot_page = requests.get(uniprot_url)
+        uniprot_page = requests.get(url=uniprot_url)
         status_code = uniprot_page.status_code
         if status_code != 200:
             res = {
                 'ensembl_id': ensembl_id, 
                 'uniprot_id': uniprot_id, 
                 'uniprot_functions': None, 
-                'metadata': f'Status code {status_code}'
+                'metadata': f'Status code: {status_code}'
             }
         else:
             uniprot_json = uniprot_page.json()

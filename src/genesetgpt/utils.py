@@ -69,7 +69,7 @@ def get_aliases(hgnc_symbol: str) -> GeneAliases:
             'metadata': f'Status code {status_code}'
         }
     else: 
-        gene_xml = xmltodict.parse(gene_page.text)
+        gene_xml = xmltodict.parse(xml_input=gene_page.text)
         arr_list = (
             gene_xml
             .get('response', {})

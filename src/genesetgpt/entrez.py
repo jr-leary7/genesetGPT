@@ -23,13 +23,17 @@ def fetch_entrez_summary(entrez_id: str, entrez_email: str) -> EntrezSummary:
         id=entrez_id, 
         retmode='xml'
     )
-    entrez_records = Entrez.read(entrez_xml, validate=False)
+    entrez_records = Entrez.read(source=entrez_xml, validate=False)
     entrez_xml.close()
     try:
         entrez_summary = entrez_records['DocumentSummarySet']['DocumentSummary'][0]['Summary']
-        entrez_summary = re.sub(r'\[provided by RefSeq[^\]]*\]', '', entrez_summary)
+        entrez_summary = re.sub(
+            pattern=r'\[provided by RefSeq[^\]]*\]', 
+            repl='', 
+            string=entrez_summary
+        )
     except Exception as e:
-        entrezy_summary = None
+        entrez_summary = None
     res = {
         'entrez_id': entrez_id, 
         'entrez_summary': entrez_summary

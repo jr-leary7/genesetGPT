@@ -22,7 +22,7 @@ def fetch_HPA_data(ensembl_id: str) -> HPAData:
         A dict containing the Ensembl ID, lists of GO:BP terms and related diseases, and other metadata. 
     """
     hpa_url = 'https://www.proteinatlas.org/' + ensembl_id + '.json'
-    hpa_page = requests.get(hpa_url)
+    hpa_page = requests.get(url=hpa_url)
     status_code = hpa_page.status_code
     if status_code != 200:
         res = {

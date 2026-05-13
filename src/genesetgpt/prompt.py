@@ -97,7 +97,8 @@ def build_prompt_df(gene_list: list,
                     mim_api_key: str = None, 
                     n_cores: int = 2, 
                     progress_bar: bool = True) -> pd.DataFrame:
-    gene_id_table = gene_id_table.query(expr='hgnc_symbol in @gene_list').copy()
+    mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
+    gene_id_table = gene_id_table[mask].copy()
     gene_id_table.dropna(inplace=True)
     pandarallel.initialize(
         progress_bar=progress_bar, 

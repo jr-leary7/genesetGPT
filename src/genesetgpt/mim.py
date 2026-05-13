@@ -82,7 +82,7 @@ def fetch_mim_summary(ensembl_id: str,
     res : dict 
         A dict containing the Ensembl ID, a list of corresponding MIM IDs, and a collated MIM summary. 
     """
-    mim_ids = mapping_table.query(f"ensembl_id == '{ensembl_id}'")['mim_id'].to_list()
+    mim_ids = mapping_table.query(expr=f"ensembl_id == '{ensembl_id}'")['mim_id'].to_list()
     if len(mim_ids) == 0:
         res = {
             'ensembl_id': ensembl_id, 
@@ -97,12 +97,12 @@ def fetch_mim_summary(ensembl_id: str,
             mim_url += elem 
             mim_url += '&include=text&include=geneMap&apiKey='
             mim_url += mim_api_key
-            mim_page = requests.get(mim_url)
+            mim_page = requests.get(url=mim_url)
             time.sleep(sleep_interval)
             status_code = mim_page.status_code
             if status_code != 200:
                 raise KeyError(f'Returned status code was: {status_code}')
-            mim_json = xmltodict.parse(mim_page.text)
+            mim_json = xmltodict.parse(xml_input=mim_page.text)
             try:
                 mim_description = mim_json['omim']['entryList']['entry']['textSectionList']['textSection'][0]['textSectionContent']
             except (KeyError, TypeError):
@@ -111,9 +111,17 @@ def fetch_mim_summary(ensembl_id: str,
                 mim_description = mim_json['omim']['entryList']['entry']['textSectionList']['textSection']['textSectionContent']
             except (KeyError, TypeError):
                 pass
-            mim_description = re.sub(r' \(summary by \{[^}]*\}\)', '', mim_description)
-            mim_description = re.sub(r'\{\d+:.*?\}\s*', '', mim_description)
-            mim_description = add_trailing_period(mim_description)
+            mim_description = re.sub(
+                pattern=r' \(summary by \{[^}]*\}\)', 
+                repl='', 
+                string=mim_description
+            )
+            mim_description = re.sub(
+                pattern=r'\{\d+:.*?\}\s*', 
+                repl='', 
+                string=mim_description
+            )
+            mim_description = add_trailing_period(text=mim_description)
             mim_summary.append(mim_description)
         res = {
             'ensembl_id': ensembl_id, 
