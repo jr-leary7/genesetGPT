@@ -1,4 +1,11 @@
-# About
+<!-- badges: start -->
+[![language](https://img.shields.io/badge/-Python?logo=Python&logoColor=white)](https://github.com/topics/python)
+[![supported versions](https://img.shields.io/badge/python-%3E%3D3.12-blue)](https://github.com/jr-leary7/genesetGPT)
+![release](https://img.shields.io/github/v/release/jr-leary7/genesetGPT?color=purple)
+[![license: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+
+# Background
 
 `genesetGPT` is a Python package that enables researchers to precisely summarize individual genes and larger gene sets using LLMs (currently only OpenAI models are supported). The LLMs are strictly guided by functional contexts pulled from databases such as [the Human Protein Atlas](https://www.proteinatlas.org), [UniProt](https://www.uniprot.org), and NCBI's [Entrez database](https://www.ncbi.nlm.nih.gov/gene/). 
 
