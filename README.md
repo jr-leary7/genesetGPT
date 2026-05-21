@@ -34,8 +34,8 @@ uv pip install git+https://github.com/jr-leary7/genesetGPT.git
 
 In this repository's `notebooks/` subdirectory there are several [`marimo` notebooks](https://marimo.io) (a drop-in replacement for Jupyter notebooks that stores everything as pure Python code) demonstrating how to use the package. 
 
-[!IMPORTANT]
-Each example notebook imports non-default dependencies that are not included with the `genesetGPT` install e.g., `scanpy`, `squidpy`, and `scikit-learn` for `notebooks/spatial_case_study.py`. Each `marimo` notebook, when launched, will immediately alert you as to which dependencies are not installed in your virtual environment, and provide instructions as to how to add them. 
+>[!IMPORTANT]
+>Each example notebook imports non-default dependencies that are not included with the `genesetGPT` install e.g., `scanpy`, `squidpy`, and `scikit-learn` for `notebooks/spatial_case_study.py`. Each `marimo` notebook, when launched, will immediately alert you as to which dependencies are not installed in your virtual environment, and provide instructions as to how to add them. 
 
 To run e.g., the spatially-resolved transcriptomics case study notebook run the following in your terminal (with your virtual environment activated):
 
