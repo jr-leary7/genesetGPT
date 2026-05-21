@@ -10,17 +10,11 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "biopython>=1.85",
-    "cellrank>=2.0.7",
     "curl-cffi>=0.15.0",
     "marimo>=0.18.1",
     "openai>=1.86.0",
     "pandarallel>=1.6.5",
     "pybiomart>=0.2.0",
-    "python-igraph>=0.11.9",
-    "scanpy>=1.11.2",
-    "scikit-misc>=0.5.1",
-    "session-info>=1.0.1",
-    "squidpy>=1.6.5",
     "unipressed>=1.4.0",
     "xmltodict>=0.14.2",
 ]
