@@ -9,6 +9,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "anthropic>=0.104.1",
     "biopython>=1.85",
     "curl-cffi>=0.15.0",
     "marimo>=0.18.1",
