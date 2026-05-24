@@ -53,7 +53,7 @@ def fetch_gene_table(sort_by: str = 'hgnc_symbol', alt_ensembl_archive: Optional
     )
     gene_df['entrez_id'] = gene_df['entrez_id'].map(lambda x: f'{x:.0f}').astype(str)
     gene_df['description'] = gene_df['description'].str.replace(
-        pattern=r'\s*\[Source:[^\]]*\]', 
+        pat=r'\s*\[Source:[^\]]*\]', 
         repl='', 
         regex=True
     )
