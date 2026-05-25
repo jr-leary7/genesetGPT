@@ -20,7 +20,7 @@ __all__ = [
     'fetch_mim_summary', 
     'build_user_prompt', 
     'build_prompt_df', 
-    'summarize_genes', 
+    'summarize_gene', 
     'summarize_individual_genes',  
     'summarize_module', 
     'get_embedding', 
