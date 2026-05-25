@@ -1,4 +1,3 @@
-import openai
 import pandarallel
 import pandas as pd
 from .hpa import fetch_HPA_data
@@ -72,7 +71,7 @@ def build_user_prompt(ensembl_id: str,
         prompt_user += 'Known aliases for this gene include: '
         prompt_user += gene_aliases
         prompt_user += '. '
-    prompt_user += 'Please coalesce the various summaries into a single 3-5 sentence description of the function of the gene. In addition, please provide a score ranging from 0-1 specifying how confident you are in your summarization. '
+    prompt_user += "Please coalesce the various summaries into a single 3-5 sentence description of the gene's function, using only the provided information. In addition, please provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your summarization, along with an accompanying short rationale justifying your confidence score. "
     if go_bp_terms is not None:
         prompt_user += 'According to the Human Protein Atlas (HPA) the Gene Ontology Biological Process (GO:BP) terms this gene is involved in are: '
         prompt_user += go_bp_terms
@@ -95,14 +94,14 @@ def build_prompt_df(gene_list: list,
                     gene_id_table: pd.DataFrame, 
                     mim_mapping_table: pd.DataFrame, 
                     mim_api_key: str = None, 
-                    n_cores: int = 2, 
+                    n_workers: int = 2, 
                     progress_bar: bool = True) -> pd.DataFrame:
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
     gene_id_table.dropna(inplace=True)
     pandarallel.initialize(
         progress_bar=progress_bar, 
-        nb_workers=n_cores, 
+        nb_workers=n_workers, 
         verbose=0
     )
     gene_id_table['prompt_user'] = gene_id_table.parallel_apply(
