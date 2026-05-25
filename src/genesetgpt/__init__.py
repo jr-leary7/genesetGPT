@@ -6,7 +6,7 @@ from .entrez import fetch_entrez_summary
 from .mim import fetch_mim_table, fetch_mim_summary 
 from .prompt import build_user_prompt, build_prompt_df
 from .utils import add_trailing_period, cosine_sim, get_aliases
-from .llm import summarize_genes, get_embedding, summarize_individual_genes, summarize_module
+from .llm import summarize_gene, get_embedding, summarize_individual_genes, summarize_module
 from .uniprot import fetch_canonical_protein_product, clean_uniprot_summary, fetch_uniprot_summary
 
 __all__ = [
@@ -21,7 +21,7 @@ __all__ = [
     'build_user_prompt', 
     'build_prompt_df', 
     'summarize_gene', 
-    'summarize_individual_genes',  
+    'summarize_individual_genes',
     'summarize_module', 
     'get_embedding', 
     'add_trailing_period', 
