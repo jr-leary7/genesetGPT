@@ -1,4 +1,4 @@
-`genesetGPT`
+# `genesetGPT`
 
 <!-- badges: start -->
 [![language](https://img.shields.io/badge/-Python?logo=Python&logoColor=white)](https://github.com/topics/python)
