@@ -37,7 +37,7 @@ def fetch_mim_table(sort_by: str = 'hgnc_symbol') -> pd.DataFrame:
             skiprows=4
         )
     else: 
-        raise ValueError(f'The returned HTTP status code was: {response.status_code}')
+        raise ValueError(f"The OMIM site's returned HTTP status code was: {response.status_code}")
     mim_mapping_df.drop_duplicates(inplace=True)
     mim_mapping_df.rename(
         columns={
