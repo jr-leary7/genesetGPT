@@ -37,6 +37,7 @@ def summarize_gene(prompt_user: str,
     -------
         A tuple containing the gene-level summary, estimated confidence score, and confidence score rationale. 
     """
+    provider = provider.lower()
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
@@ -130,6 +131,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     user_prompt_df : pd.DataFrame
         A pd.DataFrame containing added columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
     """
+    provider = provider.lower()
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
@@ -187,6 +189,7 @@ def summarize_module(module_genes: list,
     -------
         A dict containing the gene module summary / name / confidence score / confidence score rationale formatted as a pd.DataFrame, and the raw LLM response's JSON output. 
     """
+    provider = provider.lower()
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
