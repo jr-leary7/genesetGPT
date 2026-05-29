@@ -6,6 +6,7 @@ from typing import Union, Any
 from functools import partial
 from pydantic import BaseModel
 from concurrent.futures import ThreadPoolExecutor
+
 class GeneSummary(BaseModel):
     summary: str
     confidence_score: float

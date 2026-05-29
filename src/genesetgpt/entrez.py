@@ -6,7 +6,9 @@ class EntrezSummary(TypedDict):
     entrez_id: str
     entrez_summary: str
 
-def fetch_entrez_summary(entrez_id: str, entrez_email: str) -> EntrezSummary:
+def fetch_entrez_summary(entrez_id: str, 
+                         entrez_email: str, 
+                         entrez_api_key : str = None) -> EntrezSummary:
     """
     Fetch the NCBI Entrez summary for a given gene. 
 
@@ -16,12 +18,16 @@ def fetch_entrez_summary(entrez_id: str, entrez_email: str) -> EntrezSummary:
         A string specifying the Entrez ID of the gene of interest. 
     entrez_email : ``str``
         A string specifying the email address associated with the Entrez query. 
+    entrez_api_key : ``str``
+        A string specifying the optional API key for the Entrez database. Adding the API key allows more requests per second. Defaults to None.
 
     Returns
     -------
         A dictionary containing the gene's Entrez ID and corresponding summary.
     """
     Entrez.email = entrez_email
+    if entrez_api_key is not None:
+        Entrez.api_key = entrez_api_key
     entrez_xml = Entrez.esummary(
         db='gene', 
         id=entrez_id, 
