@@ -13,13 +13,13 @@ def fetch_mim_table(sort_by: str = 'hgnc_symbol') -> pd.DataFrame:
 
     Parameters
     ----------
-    sort_by : str 
+    sort_by : ``str`` 
         A string specifying the gene ID to sort the table by. Defaults to 'hgnc_symbol'. 
 
     Returns
     -------
-    mim_mapping_df : pd.DataFrame 
-        A DataFrame that specifies the relationships between MIM ID, Ensembl ID, Entrez ID, and HGNC symbol. 
+    mim_mapping_df : ``pd.DataFrame`` 
+        A ``pd.DataFrame`` that specifies the relationships between MIM ID, Ensembl ID, Entrez ID, and HGNC symbol. 
     """
     headers = {
         'Referer': 'https://www.omim.org/',
@@ -68,19 +68,19 @@ def fetch_mim_summary(ensembl_id: str,
 
     Parameters
     ----------
-    ensembl_id : str 
+    ensembl_id : ``str`` 
         A string specifying the Ensembl ID of the gene of interest.
-    mapping_table : pd.DataFrame 
-        A DataFrame containing the mapping from MIM ID to Ensembl ID. 
-    mim_api_key : str 
+    mapping_table : ``pd.DataFrame`` 
+        A ``pd.DataFrame`` containing the mapping from MIM ID to Ensembl ID. 
+    mim_api_key : ``str`` 
         A string specifying the API key for the MIM database. 
-    sleep_interval : float
+    sleep_interval : ``float``
         A float specifying how long the MIM request should be left to wait before fetching results. Defaults to 1. 
 
     Returns
     -------
-    res : dict 
-        A dict containing the Ensembl ID, a list of corresponding MIM IDs, and a collated MIM summary. 
+    res : ``dict`` 
+        A dictionary containing the Ensembl ID, a list of corresponding MIM IDs, and a collated MIM summary. 
     """
     mim_ids = mapping_table.query(expr=f"ensembl_id == '{ensembl_id}'")['mim_id'].to_list()
     if len(mim_ids) == 0:

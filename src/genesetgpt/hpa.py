@@ -13,13 +13,13 @@ def fetch_HPA_data(ensembl_id: str) -> HPAData:
 
     Parameters
     ----------
-    ensembl_id : str
+    ensembl_id : ``str``
         A string specifying the Ensembl ID for which data will be scraped. 
 
     Returns
     -------
-    res: dict 
-        A dict containing the Ensembl ID, lists of GO:BP terms and related diseases, and other metadata. 
+    res: ``dict`` 
+        A dictionary containing the Ensembl ID, lists of GO:BP terms and related diseases, and other metadata. 
     """
     hpa_url = 'https://www.proteinatlas.org/' + ensembl_id + '.json'
     hpa_page = requests.get(url=hpa_url)

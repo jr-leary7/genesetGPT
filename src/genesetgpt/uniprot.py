@@ -17,17 +17,17 @@ def fetch_canonical_protein_product(ensembl_id: str,
 
     Parameters
     ----------
-    ensembl_id : str 
+    ensembl_id : ``str`` 
         A string specifying the Ensembl ID of the gene of interest.
-    poll_interval : float
+    poll_interval : ``float``
         A float specifying how long the process should sleep between polling the request. Defaults to 0.5 seconds.
-    max_wait : float
+    max_wait : ``float``
         A float specifying the maximum amount of time to wait for the request to complete. Defaults to 30 seconds.
 
     Returns
     -------
-    res : dict
-        A dict containing the gene's Ensembl ID and the UniProt ID of its canonical protein product. 
+    res : ``dict``
+        A dictionary containing the gene's Ensembl ID and the UniProt ID of its canonical protein product. 
     """
     request = IdMappingClient.submit(
         source='Ensembl', 
@@ -67,12 +67,12 @@ def clean_uniprot_summary(text: str) -> str:
 
     Parameters
     ----------
-    text : str 
+    text : ``str ``
         A string containing the UniProt summary. Defaults to None. 
 
     Returns
     -------
-    text_clean : str
+    text_clean : ``str``
         A string containing the reformatted summary. 
     """
     text_clean = re.sub(r'\(\s*PubMed:\d+(?:,\s*PubMed:\d+)*\s*\)', '', text)
@@ -95,13 +95,13 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
 
     Parameters
     ----------
-    ensembl_id : str 
+    ensembl_id : ``str`` 
         A string specifying the Ensembl ID of the gene of interest. Defaults to None.
 
     Returns
     -------
-    res : dict 
-        A dict containing (if the request is successful) the Ensembl ID, corresponding UniProt ID, a list of UniProt functional summaries, and associated metadata. 
+    res : ``dict`` 
+        A dictionary containing (if the request is successful) the Ensembl ID, corresponding UniProt ID, a list of UniProt functional summaries, and associated metadata. 
     """
     uniprot_id = fetch_canonical_protein_product(ensembl_id=ensembl_id)['canonical_protein_product']
     if uniprot_id is None:

@@ -12,10 +12,14 @@ def fetch_entrez_summary(entrez_id: str, entrez_email: str) -> EntrezSummary:
 
     Parameters
     ----------
-    entrez_id : str 
+    entrez_id : ``str ``
         A string specifying the Entrez ID of the gene of interest. 
-    entrez_email : str 
+    entrez_email : ``str``
         A string specifying the email address associated with the Entrez query. 
+
+    Returns
+    -------
+        A dictionary containing the gene's Entrez ID and corresponding summary.
     """
     Entrez.email = entrez_email
     entrez_xml = Entrez.esummary(

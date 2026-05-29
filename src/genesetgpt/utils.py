@@ -9,12 +9,12 @@ def add_trailing_period(text: str) -> str:
 
     Parameters
     ----------
-    text : str
+    text : ``str``
         A string to be edited. Defaults to None. 
 
     Returns
     -------
-    text : str
+    text : ``str``
         A string with a trailing period added if needed. 
     """
     if not text.endswith('.'):
@@ -23,14 +23,14 @@ def add_trailing_period(text: str) -> str:
 
 def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
     """
-    Compute the cosine similarity between two `numpy` arrays. 
+    Compute the cosine similarity between two ``numpy`` arrays. 
 
     Parameters
     ----------
-    a : np.ndarray
-        A `numpy` array. 
-    b : np.ndarray
-        A `numpy` array of the same dimension as `a`. 
+    a : ``np.ndarray``
+        An array. 
+    b : ``np.ndarray``
+        An array of the same dimension as ``a``. 
 
     Returns
     -------
@@ -51,13 +51,13 @@ def get_aliases(hgnc_symbol: str) -> GeneAliases:
 
     Parameters
     ----------
-    hgnc_symbol : str
+    hgnc_symbol : ``str``
         A string specifying the HGNC symbol of the gene of interest.
     
     Returns
     -------
-    res : dict 
-        A dict containing the HGNC symbol, a list of any known aliases / previous symbols, and associated metadata. 
+    res : ``dict`` 
+        A dictionary containing the HGNC symbol, a list of it's known aliases / previous symbols (if any), and associated metadata. 
     """
     gene_url = f'https://rest.genenames.org/fetch/symbol/{hgnc_symbol}'
     gene_page = requests.get(url=gene_url)

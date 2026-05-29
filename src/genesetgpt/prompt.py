@@ -18,23 +18,23 @@ def build_user_prompt(ensembl_id: str,
 
     Parameters
     ----------
-    ensembl_id : str
+    ensembl_id : ``str```
         A string specifying the Ensembl ID of the gene of interest.
-    hgnc_symbol : str
+    hgnc_symbol : ``str``
         A string specifying the HGNC symbol of the gene of interest.
-    entrez_id : str
+    entrez_id : ``str``
         A string specifying the Entrez ID of the gene of interest.
-    entrez_email : str
+    entrez_email : ``str``
         A string specifying the email address associated with the Entrez query.
-    mim_mapping_table : pd.DataFrame
-        A DataFrame containing the mapping from MIM ID to Ensembl ID. 
-    mim_api_key : str
+    mim_mapping_table : ``pd.DataFrame``
+        A ``pd.DataFrame`` containing the mapping from MIM ID to Ensembl ID. 
+    mim_api_key : ``str``
         A string specifying the API key for the MIM database.
 
     Returns
     -------
-    prompt_user : str 
-        A rather long string containing the generated per-gene user prompt. 
+    prompt_user : ``str`` 
+        A somewhat long string containing the generated per-gene user prompt. 
 
     """
     if include_aliases: 
@@ -102,25 +102,25 @@ def build_prompt_df(gene_list: list,
 
     Parameters
     ----------
-    gene_list : list
+    gene_list : ``list``
         A list of all individual genes (HGNC symbols) you'd like to summarize. 
-    gene_id_table : pd.DataFrame
+    gene_id_table : ``pd.DataFrame``
         The pd.DataFrame returned by fetch_gene_table(). 
-    entrez_email : str
+    entrez_email : ``str``
         A string specifying the email address associated with the Entrez query.
-    mim_mapping_table : pd.DataFrame
-        A DataFrame containing the mapping from MIM ID to Ensembl ID. 
-    mim_api_key : str
+    mim_mapping_table : ``pd.DataFrame``
+        A ``pd.DataFrame`` containing the mapping from MIM ID to Ensembl ID. 
+    mim_api_key : ``str``
         A string specifying the API key for the MIM database.
-    n_works : int
+    n_works : ``int``
         An integer specifying the number of workers to use for parallel processing. Defaults to 2.
-    progress_bar : bool
+    progress_bar : ``bool``
         A boolean specifying whether to display a progress bar during user prompt generation. Defaults to True.
 
     Returns
     -------
-    gene_id_table : pd.DataFrame
-        The input gene_id_table pd.DataFrame with an added column named 'prompt_user' containing the generated user prompts for each gene. 
+    gene_id_table : ``pd.DataFrame``
+        The input gene_id_table ``pd.DataFrame`` with an added column denoted 'prompt_user' containing the generated user prompts for each gene. 
     """
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
