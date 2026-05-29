@@ -16,7 +16,7 @@ def summarize_gene(prompt_user: str,
                    provider: str = 'anthropic', 
                    client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                    model: str = 'claude-haiku-4-5', 
-                   n_max_tokens: int = 2000) -> tuple[str, float, str]:
+                   n_max_tokens: int = 500) -> tuple[str, float, str]:
     """
     Summarize a gene given multiple literature-based functional summaries. 
 
@@ -32,6 +32,8 @@ def summarize_gene(prompt_user: str,
         An object of class `Anthropic` or `OpenAI` generated with your API key. Defaults to None. 
     model : ``str``
         A string specifying the specific LLM to use when generating the response. Defaults to 'claude-haiku-4-5'. 
+    n_max_tokens : ``int``
+        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 500.
 
     Returns
     -------
