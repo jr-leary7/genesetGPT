@@ -103,9 +103,9 @@ def build_prompt_df(gene_list: list,
     Parameters
     ----------
     gene_list : list
-        
+        A list of all individual genes (HGNC symbols) you'd like to summarize. 
     gene_id_table : pd.DataFrame
-        
+        The pd.DataFrame returned by fetch_gene_table(). 
     entrez_email : str
         A string specifying the email address associated with the Entrez query.
     mim_mapping_table : pd.DataFrame
@@ -120,7 +120,7 @@ def build_prompt_df(gene_list: list,
     Returns
     -------
     gene_id_table : pd.DataFrame
-        The input gene_id_table pd.DataFrame with an added column 'prompt_user' containing the generated user prompts for each gene. 
+        The input gene_id_table pd.DataFrame with an added column named 'prompt_user' containing the generated user prompts for each gene. 
     """
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
