@@ -1,7 +1,7 @@
-import pandarallel
 import pandas as pd
 from .hpa import fetch_HPA_data
 from .mim import fetch_mim_summary 
+from pandarallel import pandarallel
 from .entrez import fetch_entrez_summary 
 from .uniprot import fetch_uniprot_summary
 from .utils import add_trailing_period, get_aliases
@@ -34,7 +34,7 @@ def build_user_prompt(ensembl_id: str,
     Returns
     -------
     prompt_user : str 
-        A (long) string containing the generated user prompt. 
+        A rather long string containing the generated per-gene user prompt. 
 
     """
     if include_aliases: 
@@ -92,10 +92,36 @@ def build_user_prompt(ensembl_id: str,
 
 def build_prompt_df(gene_list: list, 
                     gene_id_table: pd.DataFrame, 
+                    entrez_email: str, 
                     mim_mapping_table: pd.DataFrame, 
                     mim_api_key: str = None, 
                     n_workers: int = 2, 
                     progress_bar: bool = True) -> pd.DataFrame:
+    """
+    Generate all summarization user prompts for a given set of genes in parallel.
+
+    Parameters
+    ----------
+    gene_list : list
+        
+    gene_id_table : pd.DataFrame
+        
+    entrez_email : str
+        A string specifying the email address associated with the Entrez query.
+    mim_mapping_table : pd.DataFrame
+        A DataFrame containing the mapping from MIM ID to Ensembl ID. 
+    mim_api_key : str
+        A string specifying the API key for the MIM database.
+    n_works : int
+        An integer specifying the number of workers to use for parallel processing. Defaults to 2.
+    progress_bar : bool
+        A boolean specifying whether to display a progress bar during user prompt generation. Defaults to True.
+
+    Returns
+    -------
+    gene_id_table : pd.DataFrame
+        The input gene_id_table pd.DataFrame with an added column 'prompt_user' containing the generated user prompts for each gene. 
+    """
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
     gene_id_table.dropna(inplace=True)
@@ -110,7 +136,7 @@ def build_prompt_df(gene_list: list,
             ensembl_id=row['ensembl_id'], 
             hgnc_symbol=row['hgnc_symbol'], 
             entrez_id=row['entrez_id'], 
-            entrez_email='j.leary@ufl.edu', 
+            entrez_email=entrez_email, 
             mim_mapping_table=mim_mapping_table, 
             mim_api_key=mim_api_key, 
             include_aliases=True

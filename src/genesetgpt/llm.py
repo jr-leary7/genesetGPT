@@ -100,7 +100,8 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
                                provider: str = 'anthropic', 
                                client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                                model: str = 'claude-haiku-4-5', 
-                               prompt_system: str = None) -> pd.DataFrame:
+                               prompt_system: str = None, 
+                               n_workers: int = 4) -> pd.DataFrame:
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
@@ -113,7 +114,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
         model=model
     )
     user_prompts = user_prompt_df['prompt_user'].to_list()
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=n_workers) as pool:
         results = list(pool.map(summarize_one, user_prompts))
     llm_summaries, llm_scores, llm_score_rationales = zip(*results)
     user_prompt_df['llm_summary'] = llm_summaries
