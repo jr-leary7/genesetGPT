@@ -2,22 +2,28 @@ import openai
 import anthropic
 import numpy as np
 import pandas as pd
-from typing import Union, Any
+from typing import Union
 from functools import partial
 from pydantic import BaseModel
 from concurrent.futures import ThreadPoolExecutor
+from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 
 class GeneSummary(BaseModel):
     summary: str
     confidence_score: float
     confidence_score_rationale: str
 
+@retry(
+    retry=retry_if_exception_type(exception_types=(anthropic.RateLimitError, anthropic.APIConnectionError, openai.RateLimitError)),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    stop=stop_after_attempt(max_attempt_number=5)
+)
 def summarize_gene(prompt_user: str, 
                    prompt_system: str, 
                    provider: str = 'anthropic', 
                    client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                    model: str = 'claude-haiku-4-5', 
-                   n_max_tokens: int = 500) -> tuple[str, float, str]:
+                   n_max_tokens: int = 250) -> tuple[str, float, str]:
     """
     Summarize a gene given multiple literature-based functional summaries. 
 
@@ -30,11 +36,11 @@ def summarize_gene(prompt_user: str,
     provider : ``str``
         A string specifying the backend LLM provider to use. Must be one of 'anthropic' or 'openai'. Defaults to 'anthropic'.
     client : ``Union[anthropic.Anthropic, openai.OpenAI]``
-        An object of class `Anthropic` or `OpenAI` generated with your API key. Defaults to None. 
+        An object of class ``Anthropic`` or ``OpenAI`` generated with your API key. Defaults to None. 
     model : ``str``
-        A string specifying the specific LLM to use when generating the response. Defaults to 'claude-haiku-4-5'. 
+        A string specifying the specific LLM version to use when generating the response. Defaults to 'claude-haiku-4-5'. 
     n_max_tokens : ``int``
-        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 500.
+        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 250.
 
     Returns
     -------
@@ -44,7 +50,7 @@ def summarize_gene(prompt_user: str,
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
-        raise ValueError('A client object generated with an API key must be passed to enable any LLM usage.')
+        raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if provider == 'anthropic':
         llm_res = client.messages.parse(
             model=model, 
@@ -110,9 +116,10 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
                                client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                                model: str = 'claude-haiku-4-5', 
                                prompt_system: str = None, 
+                               n_max_tokens: int = 250, 
                                n_workers: int = 4) -> pd.DataFrame:
     """
-    Summarize each individual gene in parallel based on the user prompts from build_prompt_df().
+    Summarize individual genes in parallel based on their unique, literature-based user prompts as constructed with ``build_prompt_df()``.
 
     Parameters
     ----------
@@ -123,28 +130,31 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     client : ``Union[anthropic.Anthropic, openai.OpenAI]``
         An object of class ``Anthropic`` or ``OpenAI`` generated with your API key. Defaults to None. 
     model : ``str``
-        A string specifying the specific LLM to use when generating the response. Defaults to 'claude-haiku-4-5'. 
+        A string specifying the specific LLM version to use when generating each response. Defaults to 'claude-haiku-4-5'. 
     prompt_system : ``str``
         A string containing the system prompt specifying the LLM's role and additional biological context. Defaults to None.
+    n_max_tokens : ``int``
+        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 250.
     n_workers : ``int``
         An integer specifying the number of workers to use for parallel processing. Defaults to 4.
 
     Returns
     -------
     user_prompt_df : ``pd.DataFrame``
-        A ``pd.DataFrame`` containing added columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
+        The inputted ``pd.DataFrame`` with three additional columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
     """
     provider = provider.lower()
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
-        raise ValueError('A client object generated with an API key must be passed to enable any LLM usage.')
+        raise ValueError('A client object initialized with your API key must be passed to enable any LLM usage.')
     summarize_one = partial(
         summarize_gene,
         prompt_system=prompt_system,
         provider=provider,
         client=client,
-        model=model
+        model=model, 
+        n_max_tokens=n_max_tokens
     )
     user_prompts = user_prompt_df['prompt_user'].to_list()
     with ThreadPoolExecutor(max_workers=n_workers) as pool:
@@ -167,9 +177,9 @@ def summarize_module(module_genes: list,
                      provider: str = 'anthropic', 
                      client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                      model: str = 'claude-haiku-4-5', 
-                     n_max_tokens: int = 6000) -> dict[str, Any]:
+                     n_max_tokens: int = 1500) -> dict[pd.DataFrame, str]:
     """
-    Summarize a gene module based on previously-generated LLM sumaries of individual genes. 
+    Summarize a gene module based on previously-generated LLM sumaries of each individual gene belonging to said module. 
 
     Parameters
     ----------
@@ -178,7 +188,7 @@ def summarize_module(module_genes: list,
     gene_sumy_df : ``pd.DataFrame``
         A ``pd.DataFrame`` containing the previously-generated LLM summaries of each individual gene.
     prompt_system : ``str``
-        A string containing the system prompt specifying the LLM's role and additional biological context.
+        A string containing the system prompt that specifies the desired LLM role, along with additional biological context.
     provider : ``str``
         A string specifying the backend LLM provider to use. Must be one of 'anthropic' or 'openai'. Defaults to 'anthropic'.
     client : ``Union[anthropic.Anthropic, openai.OpenAI]``
@@ -186,17 +196,17 @@ def summarize_module(module_genes: list,
     model : ``str``
         A string specifying the specific LLM to use when generating the response. Defaults to 'claude-haiku-4-5'. 
     n_max_tokens : ``int``
-        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene module. Defaults to 6000.
+        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene module. Defaults to 1500.
     
     Returns
     -------
-        A dictionary containing the gene module summary / name / confidence score / confidence score rationale formatted as a ``pd.DataFrame``, and the raw LLM response's JSON output. 
+        A dictionary containing the gene module summary / name / confidence score / confidence score rationale formatted as a ``pd.DataFrame``, along with the raw LLM response's JSON output formatted as a string. 
     """
     provider = provider.lower()
     if provider not in ['anthropic', 'openai']:
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
-        raise ValueError('A client object generated with an API key must be passed to enable any LLM usage.')
+        raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
     module_user_prompts = module_gene_ids['prompt_user'].to_list()
