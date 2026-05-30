@@ -1,4 +1,5 @@
 import openai
+import warnings
 import anthropic
 import numpy as np
 import pandas as pd
@@ -51,6 +52,11 @@ def summarize_gene(prompt_user: str,
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
+    if prompt_system is None:
+        warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
+        prompt_system = """
+        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
+        """
     if provider == 'anthropic':
         llm_res = client.messages.parse(
             model=model, 
@@ -95,7 +101,7 @@ def get_embedding(text: str,
     text : ``str``
         A string containing the text to be embedded.
     provider : ``str``
-        A string specifying the backend LLM provider to use. Must be 'openai', as Anthropic currently does not support embedding models.
+        A string specifying the backend LLM provider to use. Must be equal to 'openai', as Anthropic currently does not natively support embedding models.
     client : ``openai.OpenAI``
         An object of class ``OpenAI`` generated with your API key.
     embedding_model : ``str``
@@ -148,7 +154,12 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
         raise ValueError('A client object initialized with your API key must be passed to enable any LLM usage.')
-    summarize_one = partial(
+    if prompt_system is None:
+        warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
+        prompt_system = """
+        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
+        """
+    summarize_all = partial(
         summarize_gene,
         prompt_system=prompt_system,
         provider=provider,
@@ -158,7 +169,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     )
     user_prompts = user_prompt_df['prompt_user'].to_list()
     with ThreadPoolExecutor(max_workers=n_workers) as pool:
-        results = list(pool.map(summarize_one, user_prompts))
+        results = list(pool.map(summarize_all, user_prompts))
     llm_summaries, llm_scores, llm_score_rationales = zip(*results)
     user_prompt_df['llm_summary'] = llm_summaries
     user_prompt_df['llm_confidence_score'] = llm_scores
@@ -207,6 +218,11 @@ def summarize_module(module_genes: list,
         raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
+    if prompt_system is None:
+        warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
+        prompt_system = """
+        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
+        """
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
     module_user_prompts = module_gene_ids['prompt_user'].to_list()
