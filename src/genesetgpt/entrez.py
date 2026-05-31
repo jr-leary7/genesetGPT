@@ -19,7 +19,7 @@ def fetch_entrez_summary(entrez_id: str,
     entrez_email : ``str``
         A string specifying the email address associated with the Entrez query. 
     entrez_api_key : ``str``
-        A string specifying the optional API key for the Entrez database. Adding the API key allows more requests per second. Defaults to None.
+        A string specifying your optional API key for the Entrez database. Providing your Entrez API key allows more API requests per second (10 versus 3). Defaults to None.
 
     Returns
     -------

@@ -34,7 +34,7 @@ def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
 
     Returns
     -------
-    res : float 
+    res : ``float`` 
         A float specifying the cosine similarity between `a` and `b`. 
     """
     res = float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))

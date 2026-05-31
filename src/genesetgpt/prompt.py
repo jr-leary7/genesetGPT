@@ -14,7 +14,7 @@ def build_user_prompt(ensembl_id: str,
                       mim_api_key: str, 
                       include_aliases: bool = True) -> str: 
     """
-    Generate a user prompt for a given gene. 
+    Generate a LLM summarization user prompt for a single gene. 
 
     Parameters
     ----------
@@ -29,7 +29,7 @@ def build_user_prompt(ensembl_id: str,
     mim_mapping_table : ``pd.DataFrame``
         A ``pd.DataFrame`` containing the mapping from MIM ID to Ensembl ID. 
     mim_api_key : ``str``
-        A string specifying the API key for the MIM database.
+        A string specifying your API key for the MIM database.
 
     Returns
     -------
@@ -95,27 +95,27 @@ def build_prompt_df(gene_list: list,
                     entrez_email: str, 
                     mim_mapping_table: pd.DataFrame, 
                     mim_api_key: str = None, 
-                    n_workers: int = 2, 
+                    n_workers: int = 3, 
                     progress_bar: bool = True) -> pd.DataFrame:
     """
-    Generate all summarization user prompts for a given set of genes in parallel.
+    Generate all LLM summarization user prompts for a given list of genes in parallel.
 
     Parameters
     ----------
     gene_list : ``list``
         A list of all individual genes (HGNC symbols) you'd like to summarize. 
     gene_id_table : ``pd.DataFrame``
-        The pd.DataFrame returned by fetch_gene_table(). 
+        The pd.DataFrame returned by ``fetch_gene_table()``. 
     entrez_email : ``str``
         A string specifying the email address associated with the Entrez query.
     mim_mapping_table : ``pd.DataFrame``
         A ``pd.DataFrame`` containing the mapping from MIM ID to Ensembl ID. 
     mim_api_key : ``str``
-        A string specifying the API key for the MIM database.
-    n_works : ``int``
-        An integer specifying the number of workers to use for parallel processing. Defaults to 2.
+        A string specifying your API key for the MIM database.
+    n_workers : ``int``
+        An integer specifying the number of workers to use for parallel processing. Defaults to 3.
     progress_bar : ``bool``
-        A boolean specifying whether to display a progress bar during user prompt generation. Defaults to True.
+        A Boolean specifying whether to display a progress bar during user prompt generation. Recommended for interactive notebook usage, but should probably be set to False for script usage. Defaults to True.
 
     Returns
     -------
