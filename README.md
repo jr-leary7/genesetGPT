@@ -9,7 +9,7 @@
 
 # Background
 
-`genesetGPT` is a Python package that enables researchers to precisely summarize individual genes and larger gene sets using LLMs (currently only OpenAI models are supported, but support for Anthropic models is coming soon). The LLMs are strictly guided by functional information pulled from databases such as [the Human Protein Atlas](https://www.proteinatlas.org), [UniProt](https://www.uniprot.org), and NCBI's [Entrez database](https://www.ncbi.nlm.nih.gov/gene/), along with user-provided biological context concerning the system being studied. 
+`genesetGPT` is a Python package that enables researchers to precisely summarize individual genes and larger gene sets using LLMs. Both OpenAI and Anthropic models are currently supported for gene set summarization via each organization's APIs. The LLMs are strictly guided by functional information pulled from databases such as [the Human Protein Atlas](https://www.proteinatlas.org), [UniProt](https://www.uniprot.org), and NCBI's [Entrez database](https://www.ncbi.nlm.nih.gov/gene/), along with user-provided biological context concerning the system being studied. 
 
 # Installation 
 

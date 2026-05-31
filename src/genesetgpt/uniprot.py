@@ -13,7 +13,7 @@ def fetch_canonical_protein_product(ensembl_id: str,
                                     poll_interval: float = 0.5, 
                                     max_wait: float = 30.0) -> CanonicalProteinProduct:
     """
-    Identify the canonical protein product of a given gene. 
+    Identify the `UniProt canonical protein product`_ of a given gene. 
 
     Parameters
     ----------
@@ -28,6 +28,8 @@ def fetch_canonical_protein_product(ensembl_id: str,
     -------
     res : ``dict``
         A dictionary containing the gene's Ensembl ID and the UniProt ID of its canonical protein product. 
+
+    UniProt canonical protein product: https://www.uniprot.org/uniprotkb
     """
     request = IdMappingClient.submit(
         source='Ensembl', 
@@ -91,7 +93,7 @@ class UniProtSummary(TypedDict):
 
 def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
     """
-    Fetch the UniProt summary of the canonical protein product of a given gene. 
+    Fetch the UniProt summary of the `UniProt canonical protein product`_ of a given gene. 
 
     Parameters
     ----------
@@ -102,6 +104,8 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
     -------
     res : ``dict`` 
         A dictionary containing (if the request is successful) the Ensembl ID, corresponding UniProt ID, a list of UniProt functional summaries, and associated metadata. 
+
+    .. _UniProt canonical protein product: https://www.uniprot.org/uniprotkb
     """
     uniprot_id = fetch_canonical_protein_product(ensembl_id=ensembl_id)['canonical_protein_product']
     if uniprot_id is None:

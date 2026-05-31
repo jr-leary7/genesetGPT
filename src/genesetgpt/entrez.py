@@ -17,13 +17,15 @@ def fetch_entrez_summary(entrez_id: str,
     entrez_id : ``str ``
         A string specifying the Entrez ID of the gene of interest. 
     entrez_email : ``str``
-        A string specifying the email address associated with the Entrez query. 
+        A string specifying your email address that will be associated with the Entrez query. 
     entrez_api_key : ``str``
-        A string specifying your optional API key for the Entrez database. Providing your Entrez API key allows more API requests per second (10 versus 3). Defaults to None.
+        A string specifying your `optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
 
     Returns
     -------
         A dictionary containing the gene's Entrez ID and corresponding summary.
+
+    .. optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
     Entrez.email = entrez_email
     if entrez_api_key is not None:

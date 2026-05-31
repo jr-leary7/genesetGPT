@@ -9,7 +9,7 @@ class HPAData(TypedDict):
 
 def fetch_HPA_data(ensembl_id: str) -> HPAData:
     """
-    Fetch gene-level data from the Human Protein Atlas. 
+    Fetch a gene's related GO:BP terms & disease involvment from the `Human Protein Atlas`_. 
 
     Parameters
     ----------
@@ -20,6 +20,8 @@ def fetch_HPA_data(ensembl_id: str) -> HPAData:
     -------
     res: ``dict`` 
         A dictionary containing the Ensembl ID, lists of GO:BP terms and related diseases, and other metadata. 
+
+    .. _Human Protein Atlas: https://www.proteinatlas.org
     """
     hpa_url = 'https://www.proteinatlas.org/' + ensembl_id + '.json'
     hpa_page = requests.get(url=hpa_url)

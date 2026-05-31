@@ -10,7 +10,7 @@ def fetch_gene_table(sort_by: str = 'hgnc_symbol', alt_ensembl_archive: Optional
     Parameters
     ----------
     sort_by : ``str``
-        A string specifying the gene ID to sort the results by. Defaults to 'hgnc_symbol'. 
+        A string specifying the gene ID column to sort the results by. Defaults to 'hgnc_symbol'. 
     alt_ensembl_archive : ``str`` 
         An optional string specifying a date-specific alternative Ensembl archive URL to query e.g., 'http://may2025.archive.ensembl.org' (the most recent working archive as of this implementation). Try using this argument if the default Ensembl server times out or responds with an error. Defaults to None. 
 
