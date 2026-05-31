@@ -5,7 +5,7 @@ from pybiomart import Server
 
 def fetch_gene_table(sort_by: str = 'hgnc_symbol', alt_ensembl_archive: Optional[str] = None) -> pd.DataFrame: 
     """
-    Fetch a table of gene IDs and other per-gene metadata. 
+    Fetch a table of gene IDs and other per-gene metadata from Ensembl. 
 
     Parameters
     ----------

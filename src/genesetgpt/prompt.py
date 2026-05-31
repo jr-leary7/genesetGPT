@@ -32,7 +32,7 @@ def build_user_prompt(ensembl_id: str,
     entrez_email : ``str``
         A string specifying your email address that will be associated with the Entrez query. 
     entrez_api_key : ``str``
-        A string specifying your `optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
+        A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
     include_aliases : ``bool``
         A Boolean specifying whether to include information concerning known HGNC gene symbol aliases in the user prompt. Defaults to True.
 
@@ -42,7 +42,7 @@ def build_user_prompt(ensembl_id: str,
         A somewhat long string containing the generated per-gene user prompt. 
 
     .. _your API key: https://www.omim.org/api
-    .. _optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
+    .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
     if include_aliases: 
         gene_aliases = get_aliases(hgnc_symbol=hgnc_symbol)
@@ -128,7 +128,7 @@ def build_prompt_df(gene_list: list,
     entrez_email : ``str``
         A string specifying your email address that will be associated with the Entrez query. 
     entrez_api_key : ``str``
-        A string specifying your `optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
+        A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
     n_workers : ``int``
         An integer specifying the number of workers to use for parallel processing. Defaults to 3.
     progress_bar : ``bool``
@@ -140,7 +140,7 @@ def build_prompt_df(gene_list: list,
         The input gene_id_table ``pd.DataFrame`` with an added column denoted 'prompt_user' containing the generated user prompts for each gene. 
 
     .. _your API key: https://www.omim.org/api
-    .. _optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
+    .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()

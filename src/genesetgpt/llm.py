@@ -24,7 +24,7 @@ def summarize_gene(prompt_user: str,
                    provider: str = 'anthropic', 
                    client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                    model: str = 'claude-haiku-4-5', 
-                   n_max_tokens: int = 250) -> tuple[str, float, str]:
+                   n_max_tokens: int = 500) -> tuple[str, float, str]:
     """
     Summarize a gene given multiple literature-based functional summaries. 
 
@@ -41,7 +41,7 @@ def summarize_gene(prompt_user: str,
     model : ``str``
         A string specifying the specific LLM version to use when generating the response. Defaults to 'claude-haiku-4-5'. 
     n_max_tokens : ``int``
-        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 250.
+        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 500.
 
     Returns
     -------
@@ -122,7 +122,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
                                client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                                model: str = 'claude-haiku-4-5', 
                                prompt_system: str = None, 
-                               n_max_tokens: int = 250, 
+                               n_max_tokens: int = 500, 
                                n_workers: int = 4) -> pd.DataFrame:
     """
     Summarize individual genes in parallel based on their unique, literature-based user prompts as constructed with ``build_prompt_df()``.
@@ -140,7 +140,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     prompt_system : ``str``
         A string containing the system prompt specifying the LLM's role and additional biological context. Defaults to None.
     n_max_tokens : ``int``
-        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 250.
+        An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 500.
     n_workers : ``int``
         An integer specifying the number of workers to use for parallel processing. Defaults to 4.
 

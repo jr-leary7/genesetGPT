@@ -29,7 +29,7 @@ def fetch_canonical_protein_product(ensembl_id: str,
     res : ``dict``
         A dictionary containing the gene's Ensembl ID and the UniProt ID of its canonical protein product. 
 
-    UniProt canonical protein product: https://www.uniprot.org/uniprotkb
+    .. _UniProt canonical protein product: https://www.uniprot.org/uniprotkb
     """
     request = IdMappingClient.submit(
         source='Ensembl', 

@@ -25,7 +25,7 @@ def fetch_entrez_summary(entrez_id: str,
     -------
         A dictionary containing the gene's Entrez ID and corresponding summary.
 
-    .. optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
+    .. _optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
     Entrez.email = entrez_email
     if entrez_api_key is not None:
