@@ -256,12 +256,15 @@ def summarize_module(module_genes: list,
             text_format=GeneSetSummary
         )
         parsed_data = summary_response.output_parsed
-    summary_df = pd.DataFrame(data={
-        'summary': parsed_data.summary, 
-        'name': parsed_data.name, 
-        'score': parsed_data.confidence_score, 
-        'score_rationale': parsed_data.confidence_score_rationale
-    })
+    summary_df = pd.DataFrame(
+        data={
+            'summary': parsed_data.summary, 
+            'name': parsed_data.name, 
+            'score': parsed_data.confidence_score, 
+            'score_rationale': parsed_data.confidence_score_rationale
+        }, 
+        index=[0]
+    )
     model_json = parsed_data.model_dump_json()
     res = {
         'module_summary_df': summary_df, 
