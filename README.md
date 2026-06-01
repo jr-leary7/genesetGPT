@@ -11,7 +11,9 @@
 
 `genesetGPT` is a Python package that enables researchers to precisely summarize individual genes and larger gene sets using LLMs. Both OpenAI and Anthropic models are currently supported for gene set summarization via each organization's APIs. The LLMs are strictly guided by functional information pulled from databases such as [the Human Protein Atlas](https://www.proteinatlas.org), [UniProt](https://www.uniprot.org), and NCBI's [Entrez database](https://www.ncbi.nlm.nih.gov/gene/), along with user-provided biological context concerning the system being studied. 
 
-# Installation 
+# Setup 
+
+## Installation
 
 In order to install and start using `genesetGPT` we recommend a [`uv`](https://docs.astral.sh/uv/)-based workflow. From here on out, we assume a Unix-based system, though the commands for a Windows system [are very similar](https://docs.astral.sh/uv/getting-started/installation/#winget). First, create and navigate to a directory that will house your analysis (we'll call it `gene-set-analysis` here, but feel free to choose your own name) like so:
 
@@ -39,14 +41,43 @@ Now you can install `genesetGPT` and its dependencies from this GitHub repositor
 uv pip install git+https://github.com/jr-leary7/genesetGPT.git
 ```
 
-# Tutorial notebooks
+## API keys
 
-In this repository's `notebooks/` subdirectory there are several [`marimo` notebooks](https://marimo.io) (a drop-in replacement for Jupyter notebooks that stores everything as versionable Python code) demonstrating how to use the package. 
+In order to use `genesetGPT`, you'll need at minimum: either an OpenAI or Anthropic API key (linked to your funded acount), and a MIM API key that you've previously registered for. Optionally, you can provide an Entrez API key linked to your NCBI account; this is free, and only serves to increase the rate limit of your requests to that database from 3/sec to 10/sec. We recommend storing these in the root directory your project in a plaintext file called `.env`, then loading them into Python using a combination of the `load_dotenv()` function from [the `python-dotenv` package](https://pypi.org/project/python-dotenv/) and the `os.getenv()` function. 
+
+For example, you should format your `.env` file to look like this:
+
+```
+MIM_API_KEY='01234'
+ANTHROPIC_API_KEY='56789'
+```
+
+Import the necessary libraries, then set your API keys from `.env` as environment variables:
+
+```python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+Lastly, define your API keys as variables in your Python session:
+
+```python
+mim_key = os.getenv('MIM_API_KEY')
+anthropic_key = os.getenv('ANTHROPIC_API_KEY')
+```
+
+>[!WARNING]
+>Be incredibly careful not to commit your `.env` file containing your API keys to any code-hosting service e.g., GitHub. This can be accomplished by adding it to the `.gitignore` file in your project's root directory, which you should do immediately after creating it. In addition, avoid sharing a single API key between multiple users. 
+
+# Tutorials
+
+In this repository's [notebooks](notebooks/) subdirectory there are several [`marimo` notebooks](https://marimo.io) (a drop-in replacement for Jupyter notebooks that stores everything as versionable Python code) demonstrating how to use the package. 
 
 >[!IMPORTANT]
->Each example notebook imports dependencies that are not included with the default `genesetGPT` install e.g., `scikit-learn`, `scanpy[skmisc]`, and `squidpy` for `notebooks/spatial_case_study.py`. Each `marimo` notebook, when launched, will immediately alert you as to which notebook dependencies are not installed in your virtual environment, and provide instructions as to how to add them. 
+>Each example notebook imports additional dependencies that are not included with the default `genesetGPT` install e.g., `scikit-learn`, `scanpy[skmisc]`, and `squidpy` for [the spatially variable gene modules case study](notebooks/spatial_case_study.py). Each `marimo` notebook, when launched, will immediately alert you as to which additional dependencies are not installed in your virtual environment, and provide instructions as to how to add them. 
 
-For example, to start runinng the spatially-resolved transcriptomics case study notebook, execute the following in your terminal (with your virtual environment activated):
+For example, to load the spatially-resolved transcriptomics case study notebook, execute the following in your terminal (with your virtual environment activated):
 
 ```bash
 marimo edit notebooks/spatial_case_study.py
