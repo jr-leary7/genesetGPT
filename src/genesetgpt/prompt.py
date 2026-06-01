@@ -138,13 +138,13 @@ def build_prompt_df(gene_list: list,
     Returns
     -------
     gene_id_table : ``pd.DataFrame``
-        The input gene_id_table ``pd.DataFrame`` with an added column denoted 'prompt_user' containing the generated user prompts for each gene. 
+        The input gene_id_table ``pd.DataFrame`` with an added column denoted 'prompt_user' containing the composed user prompts for each gene. 
 
     .. _your API key: https://www.omim.org/api
     .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
     if n_workers > psutil.cpu_count(logical=False):
-        raise ValueError(f'The number of workers requested ({n_workers}) exceeds the number of physical CPU cores.')
+        raise ValueError(f'The number of workers requested ({n_workers}) exceeds your number of physical CPU cores.')
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
     gene_id_table.dropna(inplace=True)
