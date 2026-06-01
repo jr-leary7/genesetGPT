@@ -1,3 +1,4 @@
+import psutil
 import pandas as pd
 from .hpa import fetch_HPA_data
 from .mim import fetch_mim_summary 
@@ -19,7 +20,7 @@ def build_user_prompt(ensembl_id: str,
 
     Parameters
     ----------
-    ensembl_id : ``str```
+    ensembl_id : ``str``
         A string specifying the Ensembl ID of the gene of interest.
     hgnc_symbol : ``str``
         A string specifying the HGNC symbol of the gene of interest.
@@ -85,7 +86,7 @@ def build_user_prompt(ensembl_id: str,
         prompt_user += 'Known aliases for this gene include: '
         prompt_user += gene_aliases
         prompt_user += '. '
-    prompt_user += "Please coalesce the various summaries into a single 3-5 sentence description of the gene's function, using only the provided information. In addition, please provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your summarization, along with an accompanying short rationale justifying your confidence score. "
+    prompt_user += "Please coalesce the various summaries into a short description of the gene's function composed of at most 3-4 concise sentences, using only the provided information. In addition please provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your summarization, and an accompanying brief 1-2 sentence rationale justifying your confidence score. "
     if go_bp_terms is not None:
         prompt_user += 'According to the Human Protein Atlas (HPA) the Gene Ontology Biological Process (GO:BP) terms this gene is involved in are: '
         prompt_user += go_bp_terms
@@ -142,6 +143,8 @@ def build_prompt_df(gene_list: list,
     .. _your API key: https://www.omim.org/api
     .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
+    if n_workers > psutil.cpu_count(logical=False):
+        raise ValueError(f'The number of workers requested ({n_workers}) exceeds the number of physical CPU cores.')
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
     gene_id_table.dropna(inplace=True)

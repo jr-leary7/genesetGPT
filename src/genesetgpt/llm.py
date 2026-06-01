@@ -53,10 +53,8 @@ def summarize_gene(prompt_user: str,
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
-        warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
-        prompt_system = """
-        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
-        """
+        warnings.warn(message='The argument prompt_system is set to None, so a general system prompt will be passed to the LLM.')
+        prompt_system = "You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical."
     if provider == 'anthropic':
         llm_res = client.messages.parse(
             model=model, 
@@ -112,9 +110,12 @@ def get_embedding(text: str,
     embed : ``np.array``
         The LLM-generated embedding. 
     """
+    provider = provider.lower()
     if provider == 'openai':
         resp = client.embeddings.create(input=text, model=embedding_model)
         embed = np.array(resp.data[0].embedding, dtype=np.float32)
+    else:
+        raise ValueError("Provider currently must be set to 'openai' for embedding generation.")
     return embed
 
 def summarize_individual_genes(user_prompt_df: pd.DataFrame, 
@@ -157,7 +158,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
         prompt_system = """
-        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
+        You are an experienced computational biologist with extensive knowledge of next-generation sequencing analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
         """
     summarize_all = partial(
         summarize_gene,
@@ -219,10 +220,8 @@ def summarize_module(module_genes: list,
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
-        warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
-        prompt_system = """
-        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical.
-        """
+        warnings.warn(message='The argument prompt_system is set to None; so a less-detailed system prompt will be passed to the LLM.')
+        prompt_system = "You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical."
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
     module_user_prompts = module_gene_ids['prompt_user'].to_list()
@@ -232,7 +231,7 @@ def summarize_module(module_genes: list,
 
     {module_llm_summaries_bulleted}
 
-    Please write a concise (5–7 sentences) paragraph summarizing the shared function(s) of this gene set. In addition, please provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your overall annotation, along with an accompanying short rationale justifying your confidence score. Do not be reluctant to express and quantify uncertainty if it appears that the genes in the set have diverse or unclear functions. Lastly, provide a short 2-5 word name for the gene set based on your annotation.
+    Please write a concise (5–7 sentences) paragraph summarizing the shared function(s) of this gene set. In addition please provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your overall annotation, along with an accompanying short (2-4 sentences) rationale justifying your confidence score. Do not be reluctant to express and quantify uncertainty if it appears that the genes in the set have diverse or unclear functions. Finally, provide a distinctive 2-5 word name for the gene set based on your annotation.
     """
     if provider == 'anthropic':
         summary_response = client.messages.parse(
