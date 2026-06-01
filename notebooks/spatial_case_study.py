@@ -73,6 +73,8 @@ def _():
 def _(sc, warnings):
     sc.settings.verbosity = 0
     warnings.simplefilter(action='ignore')
+    pd.options.future.infer_string = False
+    ad.settings.allow_write_nullable_strings = True
     mo._runtime.context.get_context().marimo_config['runtime']['output_max_bytes'] = 100_000_000
     return
 
