@@ -224,8 +224,8 @@ def summarize_module(module_genes: list,
         prompt_system = "You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical."
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
-    module_user_prompts = module_gene_ids['prompt_user'].to_list()
-    module_llm_summaries_bulleted = '\n'.join(f'- {s}' for s in module_user_prompts)
+    module_gene_sumy = module_gene_ids['llm_summary'].to_list()
+    module_llm_summaries_bulleted = '\n'.join(f'- {s}' for s in module_gene_sumy)
     summary_prompt = f"""
     Below are brief, independent descriptions of genes in a set:
 
