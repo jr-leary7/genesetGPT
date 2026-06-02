@@ -87,37 +87,6 @@ def summarize_gene(prompt_user: str,
         )
     return res_tuple
 
-def get_embedding(text: str, 
-                  provider: str, 
-                  client: openai.OpenAI, 
-                  embedding_model: str = 'text-embedding-ada-002') -> np.ndarray:
-    """
-    Generate a numerical embedding for a given text string. 
-
-    Parameters
-    ----------
-    text : ``str``
-        A string containing the text to be embedded.
-    provider : ``str``
-        A string specifying the backend LLM provider to use. Must be equal to 'openai', as Anthropic currently does not natively support embedding models.
-    client : ``openai.OpenAI``
-        An object of class ``OpenAI`` generated with your API key.
-    embedding_model : ``str``
-        A string specifying the embedding model to be used. Defaults to 'text-embedding-ada-002'. 
-
-    Returns
-    -------
-    embed : ``np.array``
-        The LLM-generated embedding. 
-    """
-    provider = provider.lower()
-    if provider == 'openai':
-        resp = client.embeddings.create(input=text, model=embedding_model)
-        embed = np.array(resp.data[0].embedding, dtype=np.float32)
-    else:
-        raise ValueError("Provider currently must be set to 'openai' for embedding generation.")
-    return embed
-
 def summarize_individual_genes(user_prompt_df: pd.DataFrame, 
                                provider: str = 'anthropic', 
                                client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
@@ -270,3 +239,34 @@ def summarize_module(module_genes: list,
         'model_json': model_json
     }
     return res
+
+def get_embedding(text: str, 
+                  provider: str, 
+                  client: openai.OpenAI, 
+                  embedding_model: str = 'text-embedding-ada-002') -> np.ndarray:
+    """
+    Generate a numerical embedding for a given text string. 
+
+    Parameters
+    ----------
+    text : ``str``
+        A string containing the text to be embedded.
+    provider : ``str``
+        A string specifying the backend LLM provider to use. Must be equal to 'openai', as Anthropic currently does not natively support embedding models.
+    client : ``openai.OpenAI``
+        An object of class ``OpenAI`` generated with your API key.
+    embedding_model : ``str``
+        A string specifying the embedding model to be used. Defaults to 'text-embedding-ada-002'. 
+
+    Returns
+    -------
+    embed : ``np.array``
+        The LLM-generated embedding. 
+    """
+    provider = provider.lower()
+    if provider == 'openai':
+        resp = client.embeddings.create(input=text, model=embedding_model)
+        embed = np.array(resp.data[0].embedding, dtype=np.float32)
+    else:
+        raise ValueError("Provider currently must be set to 'openai' for embedding generation.")
+    return embed
