@@ -55,7 +55,10 @@ def summarize_gene(prompt_user: str,
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set to None, so a general system prompt will be passed to the LLM.')
-        prompt_system = "You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol, and do not include any information that is not explicitly present in the user prompt."
+        prompt_system = f"""
+        # Role 
+        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol, and do not include any information that is not explicitly present in the user prompt.
+        """
     if provider == 'anthropic':
         llm_res = client.messages.parse(
             model=model, 
@@ -131,6 +134,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
         prompt_system = """
+        # Role 
         You are an experienced computational biologist with extensive knowledge of next-generation sequencing analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
         """
     summarize_all = partial(
@@ -209,8 +213,11 @@ def summarize_module(module_genes: list,
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
-        warnings.warn(message='The argument prompt_system is set to None; so a less-detailed system prompt will be passed to the LLM.')
-        prompt_system = "You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt."
+        warnings.warn(message='The argument prompt_system is set to None; so a more general system prompt will be passed to the LLM.')
+        prompt_system = f"""
+        # Role 
+        You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
+        """
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
     module_llm_summaries_bulleted = '\n'.join(
@@ -336,5 +343,5 @@ def get_embedding(text: str,
         resp = client.embeddings.create(input=text, model=embedding_model)
         embed = np.array(resp.data[0].embedding, dtype=np.float32)
     else:
-        raise ValueError("Provider currently must be set to 'openai' for embedding generation.")
+        raise ValueError("Currently the provider argument must be set to 'openai' for embedding generation.")
     return embed
