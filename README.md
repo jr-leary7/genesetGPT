@@ -86,7 +86,8 @@ Next, load your API keys as described in the previous section of this README.
 ```python
 mim_key = os.getenv('MIM_API_KEY')
 entrez_key = os.getenv('ENTREZ_API_KEY')
-claude_key = api_key=os.getenv('ANTHROPIC_API_KEY')
+entrez_email = os.getenv('ENTREZ_EMAIL')
+claude_key = os.getenv('ANTHROPIC_API_KEY')
 ```
 
 Use these two helper functions to load DataFrames containing mappings between Ensembl, Entrez, HGNC symbol, & MIM IDs. 
@@ -104,7 +105,7 @@ user_prompt_df = gpt.build_prompt_df(
     gene_id_table=all_hs_genes, 
     mim_mapping_table=mim_table, 
     mim_api_key=mim_key, 
-    entrez_email='j.leary@ufl.edu',  # replace with your email
+    entrez_email=entrez_email, 
     entrez_api_key=entrez_key
 )
 ```
