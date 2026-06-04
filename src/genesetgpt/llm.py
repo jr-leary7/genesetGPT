@@ -55,7 +55,7 @@ def summarize_gene(prompt_user: str,
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set to None, so a general system prompt will be passed to the LLM.')
-        prompt_system = f"""
+        prompt_system = """
         # Role 
         You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol, and do not include any information that is not explicitly present in the user prompt.
         """
@@ -224,22 +224,21 @@ def summarize_module(module_genes: list,
         f'- **{gene}**: {summary}'
         for gene, summary in zip(module_gene_ids['hgnc_symbol'], module_gene_ids['llm_summary'])
     )
-    summary_prompt = f"""
-    # Individual Gene Summaries
-    Below are independently-generated descriptions for each gene in a module:
-    
-    <gene_descriptions>
-    {module_llm_summaries_bulleted}
-    </gene_descriptions>
+    summary_prompt = f"""# Individual Gene Summaries
+Below are independently-generated descriptions for each gene in a module:
 
-    # Instructions
-    Analyze the functional descriptions provided above and synthesize an annotation for this gene set. Your response must fulfill the following criteria:
+<gene_descriptions>
+{module_llm_summaries_bulleted}
+</gene_descriptions>
 
-    1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
-    2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in this annotation.
-    3. **Confidence Score Rationale**: Accompany your confidence score with a short (2-4 sentences) rationale justifying it. Do not hesitate to express and quantify uncertainty if the genes have highly diverse or unclear functions.
-    4. **Gene Set Name**: Provide a distinctive 2-5 word name for the gene set based on your annotation.
-    """
+# Instructions
+Analyze the functional descriptions provided above and synthesize an annotation for this gene set. Your response must fulfill the following criteria:
+
+1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
+2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in this annotation.
+3. **Confidence Score Rationale**: Accompany your confidence score with a short (2-4 sentences) rationale justifying it. Do not hesitate to express and quantify uncertainty if the genes have highly diverse or unclear functions.
+4. **Gene Set Name**: Provide a distinctive 2-5 word name for the gene set based on your annotation.
+"""
     if provider == 'anthropic':
         summary_response = client.messages.parse(
             model=model, 

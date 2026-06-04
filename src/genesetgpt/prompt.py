@@ -45,12 +45,6 @@ def build_user_prompt(ensembl_id: str,
     .. _your API key: https://www.omim.org/api
     .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
-    alias_str = ''
-    if include_aliases: 
-        alias_data = get_aliases(hgnc_symbol=hgnc_symbol)
-        if alias_data.get('aliases'):
-            joined_aliases = ', '.join(alias_data['aliases'])
-            alias_str = f'\n- **Known Aliases**: {joined_aliases}'
     hpa_data = fetch_HPA_data(ensembl_id=ensembl_id)
     go_bp_terms = hpa_data['go_bp_terms']
     diseases = hpa_data['diseases']
@@ -80,6 +74,16 @@ def build_user_prompt(ensembl_id: str,
         mim_summary = ' '.join(mim_info['mim_summary'])
     else: 
         mim_summary = mim_info['mim_summary'][0]
+    identity_blocks = [f'- **Target Gene**: {hgnc_symbol}']
+    if include_aliases:
+        alias_data = get_aliases(hgnc_symbol=hgnc_symbol)
+        if alias_data.get('aliases'):
+            joined_aliases = ', '.join(alias_data['aliases'])
+            identity_blocks.append(f'- **Aliases**: {joined_aliases}')
+    identity_blocks.append(f'- **Ensembl ID**: {ensembl_id}')
+    identity_blocks.append(f'- **Entrez ID**: {entrez_id}')
+    identity_text = '\n'.join(identity_blocks)
+
     context_blocks = []
     if go_bp_terms is not None:
         context_blocks.append(f'- **HPA GO:BP Terms**: {go_bp_terms}')
@@ -92,26 +96,23 @@ def build_user_prompt(ensembl_id: str,
     if entrez_summary is not None:
         context_blocks.append(f"- **Entrez Summary**: {entrez_summary['entrez_summary']}")
     context_text = '\n'.join(context_blocks)
-    prompt_user = f"""
-    # Gene Identity
-    - **Target Gene**: {hgnc_symbol}{alias_str}
-    - **Ensembl ID**: {ensembl_id}
-    - **Entrez ID**: {entrez_id}
+    prompt_user = f"""# Gene Identity
+{identity_text}
 
-    # Functional Summaries
-    Below is information on the gene collected from several different databases.
+# Functional Summaries
+Below is information on the target gene collected from several different databases.
 
-    <gene_data>
-    {context_text}
-    </gene_data>
+<gene_data>
+{context_text}
+</gene_data>
 
-    # Instructions
-    Please coalesce the various summaries above into a short description of the gene's function. Your response must fulfill the following criteria:
+# Instructions
+Please coalesce the various summaries above into a short description of the gene's function. Your response must fulfill the following criteria:
 
-    1. **Function Description**: Compose a short description of at most 3-4 concise sentences, using only the provided information.
-    2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your summarization.
-    3. **Confidence Score Rationale**: Accompany your score with a brief 1-2 sentence rationale justifying your estimate.
-    """
+1. **Function Description**: Compose a short description of at most 3-4 concise sentences, using only the provided information.
+2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your summarization.
+3. **Confidence Score Rationale**: Accompany your score with a brief 1-2 sentence rationale justifying your estimate.
+"""
     prompt_user = add_trailing_period(text=prompt_user.strip())
     return prompt_user
 
