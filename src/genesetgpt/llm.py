@@ -180,7 +180,7 @@ def summarize_module(module_genes: list,
                      client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                      model: str = 'claude-haiku-4-5', 
                      n_max_tokens: int = 1500, 
-                     add_latex_formatted_sumy: bool = False) -> dict[pd.DataFrame, str]:
+                     add_latex_formatted_sumy: bool = False) -> dict[str, Union[pd.DataFrame, str]]:
     """
     Summarize a gene module based on previously-generated, unique LLM summaries of each gene in the module. 
 
@@ -201,7 +201,7 @@ def summarize_module(module_genes: list,
     n_max_tokens : ``int``
         An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene module. Defaults to 1500.
     add_latex_formatted_sumy : ``bool``
-        A Boolean specifying whether to add additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is mainly useful for manuscript preparation. Defaults to False.
+        A Boolean specifying whether to add two additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is mainly useful for LaTeX-based manuscript preparation. Defaults to False.
     
     Returns
     -------
@@ -273,17 +273,17 @@ Analyze the functional descriptions provided above and synthesize an annotation 
     )
     if add_latex_formatted_sumy:
         n_max_tokens_latex = max(500, n_max_tokens // 3)
-        latex_system_prompt = 'You are a precise text-formatting assistant. Your single task is to identify human gene symbols (HGNC symbols) within a text block and wrap them in LaTeX italicization formatting for usage in a manuscript.'
+        latex_system_prompt = 'You are a precise text-formatting assistant. Your single task is to identify human gene symbols (HGNC symbols) within a text block and wrap them in LaTeX italicization formatting for usage in a scientific manuscript.'
         def format_latex(text_to_format: str) -> str:
             format_prompt = f"""
             Please take the text block below, identify any HGNC symbols (e.g., STAT3, EGFR, IL6), 
             and wrap them in standard LaTeX italicization formatting: `\\textit{{GENE_SYMBOL}}`.
             
-            Text to format:
+            Text to Format:
             {text_to_format}
             
             Strict Constraints:
-            1. Only format legitimate gene symbols, pseudogenes, etc. Do not format standard English words or celltype names. If a backslash separates two closely-related genes e.g., S100A4/A5, do not format the backslash as italicized text, but do italicize the symbols on either side of the backslash.
+            1. Only format legitimate gene symbols, pseudogenes, etc. Do not format standard English words or celltype names. If a forward slash separates two closely-related genes e.g., S100A4/A5, do not format the forward slash as italicized text, but do italicize the symbols on either side of the backslash.
             2. Under no circumstances may you alter, add to, reword, or delete any other surrounding text or punctuation.
             """
             if provider == 'anthropic':
@@ -294,7 +294,7 @@ Analyze the functional descriptions provided above and synthesize an annotation 
                     messages=[{'role': 'user', 'content': format_prompt}],
                     output_format=GeneSetSummaryLaTeX
                 )
-                return res.parsed_output.formatted_text
+                raw_text = res.parsed_output.formatted_text
             elif provider == 'openai':
                 res = client.responses.parse(
                     model=model,
@@ -305,7 +305,11 @@ Analyze the functional descriptions provided above and synthesize an annotation 
                     ],
                     text_format=GeneSetSummaryLaTeX
                 )
-                return res.output_parsed.formatted_text
+                raw_text = res.output_parsed.formatted_text
+            clean_text = raw_text.replace('\\\\', '\\')
+            clean_text = clean_text.replace('\\%', '%').replace('%', '\\%')
+            clean_text = clean_text.replace('\\&', '&').replace('&', '\\&')
+            return clean_text
         summary_df['summary_latex'] = format_latex(text_to_format=parsed_data.summary)
         summary_df['score_rationale_latex'] = format_latex(text_to_format=parsed_data.confidence_score_rationale)
     res = {
