@@ -125,7 +125,6 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
 
     Returns
     -------
-    user_prompt_df : ``pd.DataFrame``
         The inputted ``pd.DataFrame`` with three additional columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
     """
     provider = provider.lower()

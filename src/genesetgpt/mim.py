@@ -18,7 +18,6 @@ def fetch_mim_table(sort_by: str = 'hgnc_symbol') -> pd.DataFrame:
 
     Returns
     -------
-    mim_mapping_df : ``pd.DataFrame`` 
         A ``pd.DataFrame`` that specifies the relationships between MIM ID, Ensembl ID, Entrez ID, and HGNC symbol. 
     """
     headers = {
@@ -79,7 +78,6 @@ def fetch_mim_summary(ensembl_id: str,
 
     Returns
     -------
-    res : ``dict`` 
         A dictionary containing the Ensembl ID, a list of corresponding MIM IDs, and a collated MIM summary. 
 
     .. _your API key: https://www.omim.org/api

@@ -39,7 +39,6 @@ def build_user_prompt(ensembl_id: str,
 
     Returns
     -------
-    prompt_user : ``str`` 
         A somewhat long string containing the generated per-gene user prompt. 
 
     .. _your API key: https://www.omim.org/api
@@ -148,8 +147,7 @@ def build_prompt_df(gene_list: list,
 
     Returns
     -------
-    gene_id_table : ``pd.DataFrame``
-        The input gene_id_table ``pd.DataFrame`` with an added column denoted 'prompt_user' containing the composed user prompts for each gene. 
+        The inputted ``pd.DataFrame`` with an added column denoted 'prompt_user' containing the constructed user prompts for each gene. 
 
     .. _your API key: https://www.omim.org/api
     .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317

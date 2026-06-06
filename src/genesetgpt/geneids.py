@@ -16,7 +16,6 @@ def fetch_gene_table(sort_by: str = 'hgnc_symbol', alt_ensembl_archive: Optional
 
     Returns
     -------
-    gene_df : ``pd.DataFrame`` 
         A ``pd.DataFrame`` containing gene IDs, biotypes, descriptions, and chromosomal locations. 
     """
     if alt_ensembl_archive is not None:

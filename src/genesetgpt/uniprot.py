@@ -1,6 +1,6 @@
 import re
 import time 
-import requests
+from curl_cffi import requests
 from typing import TypedDict, Optional
 from unipressed import IdMappingClient
 from .utils import add_trailing_period 
@@ -26,7 +26,6 @@ def fetch_canonical_protein_product(ensembl_id: str,
 
     Returns
     -------
-    res : ``dict``
         A dictionary containing the gene's Ensembl ID and the UniProt ID of its canonical protein product. 
 
     .. _UniProt canonical protein product: https://www.uniprot.org/uniprotkb
@@ -74,8 +73,7 @@ def clean_uniprot_summary(text: str) -> str:
 
     Returns
     -------
-    text_clean : ``str``
-        A string containing the reformatted summary. 
+        A string containing the reformatted / cleaned UniProt summary. 
     """
     text_clean = re.sub(r'\(\s*PubMed:\d+(?:,\s*PubMed:\d+)*\s*\)', '', text)
     text_clean = re.sub(r'\s{2,}', ' ', text_clean)
@@ -102,7 +100,6 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
 
     Returns
     -------
-    res : ``dict`` 
         A dictionary containing (if the request is successful) the Ensembl ID, corresponding UniProt ID, a list of UniProt functional summaries, and associated metadata. 
 
     .. _UniProt canonical protein product: https://www.uniprot.org/uniprotkb
@@ -116,10 +113,16 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
             'metadata': None
         }
     else:
-        uniprot_url = 'https://rest.uniprot.org/uniprotkb/search?&query=accession:'
-        uniprot_url += uniprot_id
-        uniprot_url += '&organism_id=9606&format=json'
-        uniprot_page = requests.get(url=uniprot_url)
+        uniprot_url = f'https://rest.uniprot.org/uniprotkb/search?&query=accession:{uniprot_id}&organism_id=9606&format=json'
+        headers = {
+            'Referer': 'https://www.uniprot.org/',
+            'Accept': 'application/json, text/plain, */*'
+        }
+        uniprot_page = requests.get(
+            url=uniprot_url,
+            impersonate='chrome',
+            headers=headers
+        )
         status_code = uniprot_page.status_code
         if status_code != 200:
             res = {

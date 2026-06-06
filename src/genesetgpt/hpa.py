@@ -1,4 +1,4 @@
-import requests
+from curl_cffi import requests
 from typing import TypedDict, Optional
 
 class HPAData(TypedDict):
@@ -18,13 +18,20 @@ def fetch_HPA_data(ensembl_id: str) -> HPAData:
 
     Returns
     -------
-    res: ``dict`` 
         A dictionary containing the Ensembl ID, lists of GO:BP terms and related diseases, and other metadata. 
 
     .. _Human Protein Atlas: https://www.proteinatlas.org
     """
-    hpa_url = 'https://www.proteinatlas.org/' + ensembl_id + '.json'
-    hpa_page = requests.get(url=hpa_url)
+    hpa_url = f'https://www.proteinatlas.org/{ensembl_id}.json'
+    headers = {
+        'Referer': 'https://www.proteinatlas.org/',
+        'Accept': 'application/json, text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    }
+    hpa_page = requests.get(
+        url=hpa_url,
+        impersonate='chrome',
+        headers=headers
+    )
     status_code = hpa_page.status_code
     if status_code != 200:
         res = {
