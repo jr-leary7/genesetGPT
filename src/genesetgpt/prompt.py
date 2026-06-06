@@ -1,3 +1,5 @@
+import os
+import sys
 import pandas as pd
 from tqdm.auto import tqdm
 from .hpa import fetch_HPA_data
@@ -82,7 +84,6 @@ def build_user_prompt(ensembl_id: str,
     identity_blocks.append(f'- **Ensembl ID**: {ensembl_id}')
     identity_blocks.append(f'- **Entrez ID**: {entrez_id}')
     identity_text = '\n'.join(identity_blocks)
-
     context_blocks = []
     if go_bp_terms is not None:
         context_blocks.append(f'- **HPA GO:BP Terms**: {go_bp_terms}')
@@ -167,6 +168,11 @@ def build_prompt_df(gene_list: list,
             include_aliases=True
         )
     rows = list(gene_id_table.itertuples(index=False))
+    is_macos = sys.platform == 'darwin'
+    original_no_proxy = None
+    if is_macos:
+        original_no_proxy = os.environ.get('no_proxy')
+        os.environ['no_proxy'] = '*'
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
         iterator = executor.map(fetch_prompt, rows)
         if progress_bar:
@@ -179,5 +185,10 @@ def build_prompt_df(gene_list: list,
             )
         else:
             res = list(iterator)
+    if is_macos:
+        if original_no_proxy is not None:
+            os.environ['no_proxy'] = original_no_proxy
+        else:
+            del os.environ['no_proxy']
     gene_id_table['prompt_user'] = res
     return gene_id_table
