@@ -1,3 +1,5 @@
+import time
+import random
 from curl_cffi import requests
 from typing import TypedDict, Optional
 
@@ -27,12 +29,23 @@ def fetch_HPA_data(ensembl_id: str) -> HPAData:
         'Referer': 'https://www.proteinatlas.org/',
         'Accept': 'application/json, text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
     }
-    hpa_page = requests.get(
-        url=hpa_url,
-        impersonate='chrome',
-        headers=headers
-    )
-    status_code = hpa_page.status_code
+    delay = random.uniform(0.1, 0.25)
+    time.sleep(delay)
+    try:
+        hpa_page = requests.get(
+            url=hpa_url,
+            impersonate='chrome',
+            headers=headers,
+            timeout=15
+        )
+        status_code = hpa_page.status_code
+    except Exception as e:
+        return {
+            'ensembl_id': ensembl_id, 
+            'go_bp_terms': None, 
+            'diseases': None, 
+            'metadata': f'HPA Network/CFFI Error: {str(e)}'
+        }
     if status_code != 200:
         res = {
             'ensembl_id': ensembl_id, 

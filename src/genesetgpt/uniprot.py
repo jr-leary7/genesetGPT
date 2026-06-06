@@ -1,5 +1,6 @@
 import re
-import time 
+import time
+import random
 from curl_cffi import requests
 from typing import TypedDict, Optional
 from unipressed import IdMappingClient
@@ -118,12 +119,23 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
             'Referer': 'https://www.uniprot.org/',
             'Accept': 'application/json, text/plain, */*'
         }
-        uniprot_page = requests.get(
-            url=uniprot_url,
-            impersonate='chrome',
-            headers=headers
-        )
-        status_code = uniprot_page.status_code
+        delay = random.uniform(0.1, 0.25)
+        time.sleep(delay)
+        try:
+            uniprot_page = requests.get(
+                url=uniprot_url,
+                impersonate='chrome',
+                headers=headers,
+                timeout=15 
+            )
+            status_code = uniprot_page.status_code
+        except Exception as e:
+            return {
+                'ensembl_id': ensembl_id, 
+                'uniprot_id': uniprot_id, 
+                'uniprot_functions': None, 
+                'metadata': f'UniProt Network/CFFI Error: {str(e)}'
+            }
         if status_code != 200:
             res = {
                 'ensembl_id': ensembl_id, 

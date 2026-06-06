@@ -343,8 +343,7 @@ def get_embedding(text: str,
 
     Returns
     -------
-    embed : ``np.array``
-        The LLM-generated embedding. 
+        The LLM-generated embedding formatted as an ``np.array`` object comprised of ``np.float32`` values. 
     """
     provider = provider.lower()
     if provider == 'openai':

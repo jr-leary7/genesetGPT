@@ -1,5 +1,6 @@
 import re 
 import time 
+import random
 import xmltodict 
 import pandas as pd
 from io import StringIO
@@ -60,8 +61,7 @@ class MIMSummary(TypedDict):
 
 def fetch_mim_summary(ensembl_id: str, 
                       mapping_table: pd.DataFrame, 
-                      mim_api_key: str, 
-                      sleep_interval: float = 1.0) -> MIMSummary:
+                      mim_api_key: str) -> MIMSummary:
     """
     Fetch the MIM summary for a given gene of interest. 
 
@@ -92,16 +92,34 @@ def fetch_mim_summary(ensembl_id: str,
     else:
         mim_ids = [str(s).strip() for s in mim_ids]
         mim_summary = []
+        headers = {
+            'Referer': 'https://www.omim.org/',
+            'Accept': 'application/xml, text/xml, */*'
+        }
         for elem in mim_ids:
-            mim_url = 'https://api.omim.org/api/entry?mimNumber=' 
-            mim_url += elem 
-            mim_url += '&include=text&include=geneMap&apiKey='
-            mim_url += mim_api_key
-            mim_page = requests.get(url=mim_url)
-            time.sleep(sleep_interval)
+            mim_url = f'https://api.omim.org/api/entry?mimNumber={elem}&include=text&include=geneMap&apiKey={mim_api_key}'
+            delay = random.uniform(0.1, 0.25)
+            time.sleep(delay)
+            try:
+                mim_page = requests.get(
+                    url=mim_url,
+                    impersonate='chrome',
+                    headers=headers,
+                    timeout=15
+                )
+            except Exception:
+                return {
+                    'ensembl_id': ensembl_id, 
+                    'mim_ids': mim_ids, 
+                    'mim_summary': None
+                }
             status_code = mim_page.status_code
             if status_code != 200:
-                raise KeyError(f'Returned status code was: {status_code}')
+                return {
+                    'ensembl_id': ensembl_id, 
+                    'mim_ids': mim_ids, 
+                    'mim_summary': None
+                }
             mim_json = xmltodict.parse(xml_input=mim_page.text)
             try:
                 mim_description = mim_json['omim']['entryList']['entry']['textSectionList']['textSection'][0]['textSectionContent']
