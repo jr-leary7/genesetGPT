@@ -225,19 +225,20 @@ In all responses, do not utilize any means of referring to a gene other than its
 """
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
+    n_module_genes = len(module_genes)
     module_llm_summaries_bulleted = '\n'.join(
         f'- **{gene}**: {summary}'
         for gene, summary in zip(module_gene_ids['hgnc_symbol'], module_gene_ids['llm_summary'])
     )
     summary_prompt = f"""# Individual Gene Summaries
-Below are independently-generated descriptions for each gene in a module:
+Below are independently-generated descriptions for each of {n_module_genes} genes in a module:
 
 <gene_descriptions>
 {module_llm_summaries_bulleted}
 </gene_descriptions>
 
 # Instructions
-Analyze the functional descriptions provided above and synthesize an annotation for this gene set. When considering the size of the provided gene set, only count the number of distinct, bulleted HGNC symbols (not including any aliases, prior symbols, alternate IDs, etc. following the bullet's HGNC symbol label) in the above list. Lastly, your final response must fulfill the following strict criteria:
+Analyze the functional descriptions provided above and synthesize an annotation for this gene set. This gene set contains exactly {n_module_genes} distinct HGNC symbols. Whenever you reference the size of the gene set in the module summary or confidence score rationale, you must use the number {n_module_genes} verbatim. Lastly, your final response must fulfill the following exact criteria:
 
 1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
 2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in your annotation.
@@ -288,8 +289,8 @@ Analyze the functional descriptions provided above and synthesize an annotation 
             {text_to_format}
             
             Strict Constraints:
-            1. Only format legitimate human gene symbols, pseudogenes, etc. Do not format standard English words or celltype names. If a forward slash separates two closely-related genes e.g., S100A4/A5, do not format the forward slash as italicized text, but do italicize the symbols on either side of the forward slash.
-            2. Under no circumstances may you alter, add to, reword, or delete any other surrounding text or punctuation.
+            1. Only format legitimate human gene symbols, pseudogenes, etc. Do not format standard English words or celltype names. If a forward slash separates two closely-related gene symbols e.g., S100A4/A5, do not format the forward slash as italicized text, but do italicize the gene symbols on either side of the forward slash.
+            2. Under no circumstances may you alter, add to, reword, or delete any other surrounding text or punctuation. Seriously.
             """
             if provider == 'anthropic':
                 res = client.messages.parse(
