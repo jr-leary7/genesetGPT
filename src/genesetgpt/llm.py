@@ -55,10 +55,12 @@ def summarize_gene(prompt_user: str,
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set to None, so a general system prompt will be passed to the LLM.')
-        prompt_system = """
-        # Role 
-        You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol, and do not include any information that is not explicitly present in the user prompt.
-        """
+        prompt_system = """# Role 
+You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
+
+# Strict Constraints 
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol, and do not include any information that is not explicitly present in the user prompt.
+"""
     if provider == 'anthropic':
         llm_res = client.messages.parse(
             model=model, 
@@ -133,10 +135,12 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
         raise ValueError('A client object initialized with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set as None; so a less-detailed system prompt will be passed to the LLM.')
-        prompt_system = """
-        # Role 
-        You are an experienced computational biologist with extensive knowledge of next-generation sequencing analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
-        """
+        prompt_system = """# Role 
+You are an experienced computational biologist with extensive knowledge of next-generation sequencing analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
+
+# Strict Constraints 
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
+"""
     summarize_all = partial(
         summarize_gene,
         prompt_system=prompt_system,
@@ -214,10 +218,12 @@ def summarize_module(module_genes: list,
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
         warnings.warn(message='The argument prompt_system is set to None; so a more general system prompt will be passed to the LLM.')
-        prompt_system = f"""
-        # Role 
-        You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
-        """
+        prompt_system = f"""# Role 
+You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
+
+# Strict Constraints 
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
+"""
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
     module_llm_summaries_bulleted = '\n'.join(
@@ -235,8 +241,8 @@ Below are independently-generated descriptions for each gene in a module:
 Analyze the functional descriptions provided above and synthesize an annotation for this gene set. Your response must fulfill the following criteria:
 
 1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
-2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in this annotation.
-3. **Confidence Score Rationale**: Accompany your confidence score with a short (2-4 sentences) rationale justifying it. Do not hesitate to express and quantify uncertainty if the genes have highly diverse or unclear functions.
+2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in your annotation.
+3. **Confidence Score Rationale**: Accompany your estimated confidence score with a brief (2-4 sentences) rationale justifying its value. Do not hesitate to express and quantify your uncertainty if the genes have highly diverse or unclear functions.
 4. **Gene Set Name**: Provide a distinctive 2-5 word name for the gene set based on your annotation.
 """
     if provider == 'anthropic':
@@ -275,15 +281,15 @@ Analyze the functional descriptions provided above and synthesize an annotation 
         n_max_tokens_latex = max(500, n_max_tokens // 3)
         latex_system_prompt = 'You are a precise text-formatting assistant. Your single task is to identify human gene symbols (HGNC symbols) within a text block and wrap them in LaTeX italicization formatting for usage in a scientific manuscript.'
         def format_latex(text_to_format: str) -> str:
-            format_prompt = f"""
+            format_prompt = rf"""
             Please take the text block below, identify any HGNC symbols (e.g., STAT3, EGFR, IL6), 
-            and wrap them in standard LaTeX italicization formatting: `\\textit{{GENE_SYMBOL}}`.
+            and wrap them in standard LaTeX italicization formatting like so: `\textit{{GENE_SYMBOL}}`.
             
             Text to Format:
             {text_to_format}
             
             Strict Constraints:
-            1. Only format legitimate gene symbols, pseudogenes, etc. Do not format standard English words or celltype names. If a forward slash separates two closely-related genes e.g., S100A4/A5, do not format the forward slash as italicized text, but do italicize the symbols on either side of the backslash.
+            1. Only format legitimate human gene symbols, pseudogenes, etc. Do not format standard English words or celltype names. If a forward slash separates two closely-related genes e.g., S100A4/A5, do not format the forward slash as italicized text, but do italicize the symbols on either side of the forward slash.
             2. Under no circumstances may you alter, add to, reword, or delete any other surrounding text or punctuation.
             """
             if provider == 'anthropic':
