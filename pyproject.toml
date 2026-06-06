@@ -1,6 +1,6 @@
 [project]
 name = "genesetgpt"
-version = "0.1.2"
+version = "0.1.3"
 description = "This package allows users to summarize gene sets using LLMs."
 readme = "README.md"
 authors = [
