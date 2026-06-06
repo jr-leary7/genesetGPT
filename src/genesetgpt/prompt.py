@@ -1,10 +1,10 @@
-import psutil
 import pandas as pd
+from tqdm.auto import tqdm
 from .hpa import fetch_HPA_data
 from .mim import fetch_mim_summary 
-from pandarallel import pandarallel
 from .entrez import fetch_entrez_summary 
 from .uniprot import fetch_uniprot_summary
+from concurrent.futures import ThreadPoolExecutor
 from .utils import add_trailing_period, get_aliases
 
 def build_user_prompt(ensembl_id: str, 
@@ -121,7 +121,7 @@ def build_prompt_df(gene_list: list,
                     mim_api_key: str, 
                     entrez_email: str, 
                     entrez_api_key : str = None,
-                    n_workers: int = 3, 
+                    n_workers: int = 6, 
                     progress_bar: bool = True) -> pd.DataFrame:
     """
     Generate all LLM summarization user prompts for a given list of genes in parallel.
@@ -141,7 +141,7 @@ def build_prompt_df(gene_list: list,
     entrez_api_key : ``str``
         A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
     n_workers : ``int``
-        An integer specifying the number of workers to use for parallel processing. Defaults to 3.
+        An integer specifying the number of workers to use for parallel processing. Defaults to 6.
     progress_bar : ``bool``
         A Boolean specifying whether to display a progress bar during user prompt generation. Recommended for interactive notebook usage, but should probably be set to False for script usage. Defaults to True.
 
@@ -152,28 +152,32 @@ def build_prompt_df(gene_list: list,
     .. _your API key: https://www.omim.org/api
     .. _your optional API key: https://support.nlm.nih.gov/kbArticle/?pn=KA-05317
     """
-    if n_workers > psutil.cpu_count(logical=False):
-        raise ValueError(f'The number of workers requested ({n_workers}) exceeds your number of physical CPU cores.')
     mask = gene_id_table['hgnc_symbol'].isin(values=gene_list)
     gene_id_table = gene_id_table[mask].copy()
     gene_id_table.dropna(inplace=True)
-    pandarallel.initialize(
-        progress_bar=progress_bar, 
-        nb_workers=n_workers, 
-        verbose=0
-    )
-    gene_id_table['prompt_user'] = gene_id_table.parallel_apply(
-        lambda row: 
-        build_user_prompt(
-            ensembl_id=row['ensembl_id'], 
-            hgnc_symbol=row['hgnc_symbol'], 
-            entrez_id=row['entrez_id'], 
+    def fetch_prompt(row):
+        return build_user_prompt(
+            ensembl_id=row.ensembl_id, 
+            hgnc_symbol=row.hgnc_symbol, 
+            entrez_id=row.entrez_id, 
             mim_mapping_table=mim_mapping_table, 
             mim_api_key=mim_api_key, 
             entrez_email=entrez_email, 
             entrez_api_key=entrez_api_key,
             include_aliases=True
-        ), 
-        axis=1
-    )
+        )
+    rows = list(gene_id_table.itertuples(index=False))
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+        iterator = executor.map(fetch_prompt, rows)
+        if progress_bar:
+            res = list(
+                tqdm(
+                    iterator, 
+                    total=len(rows), 
+                    desc='Building gene-level prompts'
+                )
+            )
+        else:
+            res = list(iterator)
+    gene_id_table['prompt_user'] = res
     return gene_id_table
