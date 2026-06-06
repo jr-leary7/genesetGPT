@@ -1,6 +1,7 @@
 import re
 import time
 import random
+import threading
 from curl_cffi import requests
 from typing import TypedDict, Optional
 from unipressed import IdMappingClient
@@ -8,7 +9,9 @@ from .utils import add_trailing_period
 
 class CanonicalProteinProduct(TypedDict):
     ensembl_id: str
-    canonical_protein_product: str 
+    canonical_protein_product: str
+
+sqlite_lock = threading.Lock()
 
 def fetch_canonical_protein_product(ensembl_id: str, 
                                     poll_interval: float = 0.5, 
@@ -31,32 +34,34 @@ def fetch_canonical_protein_product(ensembl_id: str,
 
     .. _UniProt canonical protein product: https://www.uniprot.org/uniprotkb
     """
-    request = IdMappingClient.submit(
-        source='Ensembl', 
-        dest='UniProtKB', 
-        ids=[ensembl_id]
-    )
+    with sqlite_lock:
+        request = IdMappingClient.submit(
+            source='Ensembl', 
+            dest='UniProtKB', 
+            ids=[ensembl_id]
+        )
     waited = 0.0
     while True:
-        status = request.get_status()
+        with sqlite_lock:
+            status = request.get_status()
         if status == 'FINISHED':
             break
         elif waited >= max_wait:
-            res = {
+            return {
                 'ensembl_id': ensembl_id, 
                 'canonical_protein_product': None
             }
-            return res
         time.sleep(poll_interval)
         waited += poll_interval
-    res = list(request.each_result())
-    if len(res) == 0:
+    with sqlite_lock:
+        results_list = list(request.each_result())
+    if len(results_list) == 0:
         res = {
             'ensembl_id': ensembl_id, 
             'canonical_protein_product': None
         }
     else:
-        canonical_uniprot_id = list(request.each_result())[0]['to']
+        canonical_uniprot_id = results_list[0]['to']
         res = {
             'ensembl_id': ensembl_id, 
             'canonical_protein_product': canonical_uniprot_id
