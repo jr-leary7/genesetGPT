@@ -106,7 +106,7 @@ Below is information on the target gene collected from several different databas
 </gene_data>
 
 # Instructions
-Please coalesce the various summaries above into a short description of the gene's function. Your response must fulfill the following criteria:
+Please coalesce the various summaries above into a short description of the gene's function. Do not hesitate to express and quantify your uncertainty if the gene's function is uncertain. Your response must fulfill the following criteria:
 
 1. **Function Description**: Compose a short description of at most 3-4 concise sentences, using only the provided information.
 2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0-1 estimating how confident you are in your summarization.

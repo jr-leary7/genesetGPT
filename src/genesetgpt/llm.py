@@ -242,7 +242,7 @@ Analyze the functional descriptions provided above and synthesize an annotation 
 
 1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
 2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in your annotation.
-3. **Confidence Score Rationale**: Accompany your estimated confidence score with a brief (2-4 sentences) rationale justifying its value. Do not hesitate to express and quantify your uncertainty if the genes have highly diverse or unclear functions.
+3. **Confidence Score Rationale**: Accompany your estimated confidence score with a brief (2-4 sentences) rationale justifying its value.
 4. **Gene Set Name**: Provide a distinctive 2-5 word name for the gene set based on your annotation.
 """
     if provider == 'anthropic':
