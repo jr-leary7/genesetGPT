@@ -92,7 +92,7 @@ class UniProtSummary(TypedDict):
 
 def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
     """
-    Fetch the UniProt summary of the `UniProt canonical protein product`_ of a given gene. 
+    Fetch the UniProt summary of the `UniProt canonical protein product`_ for a given gene. 
 
     Parameters
     ----------
