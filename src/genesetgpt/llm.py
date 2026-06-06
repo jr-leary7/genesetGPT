@@ -99,7 +99,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
                                model: str = 'claude-haiku-4-5', 
                                prompt_system: str = None, 
                                n_max_tokens: int = 500, 
-                               n_workers: int = 4, 
+                               n_workers: int = 8, 
                                progress_bar: bool = True) -> pd.DataFrame:
     """
     Summarize a set of individual genes in parallel based on their unique, literature-based user prompts as constructed with ``build_prompt_df()``.
@@ -119,7 +119,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     n_max_tokens : ``int``
         An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 500.
     n_workers : ``int``
-        An integer specifying the number of workers to use for parallel processing. Defaults to 4.
+        An integer specifying the number of workers to use for parallel processing. Defaults to 8.
     progress_bar : ``bool``
         A Boolean specifying whether to display a progress bar during per-gene summarization. Recommended for interactive notebook usage, but should probably be set to False for script usage. Defaults to True.
 
@@ -238,7 +238,7 @@ Below are independently-generated descriptions for each gene in a module:
 </gene_descriptions>
 
 # Instructions
-Analyze the functional descriptions provided above and synthesize an annotation for this gene set. Your response must fulfill the following criteria:
+Analyze the functional descriptions provided above and synthesize an annotation for this gene set. When considering the size of the provided gene set, only count the number of distinct, bulleted HGNC symbols (not including any aliases, prior symbols, alternate IDs, etc. following the bullet's HGNC symbol label) in the above list. Lastly, your final response must fulfill the following strict criteria:
 
 1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
 2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in your annotation.
