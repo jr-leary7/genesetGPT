@@ -1,4 +1,4 @@
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 from .hpa import fetch_HPA_data
 from .geneids import fetch_gene_table
