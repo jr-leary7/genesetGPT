@@ -59,7 +59,7 @@ def summarize_gene(prompt_user: str,
 You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
 
 # Strict Constraints 
-In all responses, do not utilize any means of referring to a gene other than its HGNC symbol, and do not include any information that is not explicitly present in the user prompt.
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the gene's function is nebulous or poorly-annotated.
 """
     if provider == 'anthropic':
         llm_res = client.messages.parse(
@@ -138,7 +138,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
 You are an experienced computational biologist with extensive knowledge of next-generation sequencing analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
 
 # Strict Constraints 
-In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the gene's function is nebulous or poorly-annotated.
 """
     summarize_all = partial(
         summarize_gene,
@@ -221,7 +221,7 @@ def summarize_module(module_genes: list,
 You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
 
 # Strict Constraints 
-In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Lastly, do not include any information that is not explicitly present in the user prompt.
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the module's genes have highly diverse or unclear functionalities.
 """
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
@@ -238,7 +238,7 @@ Below are independently-generated descriptions for each of {n_module_genes} gene
 </gene_descriptions>
 
 # Instructions
-Analyze the functional descriptions provided above and synthesize an annotation for this gene set. This gene set contains exactly {n_module_genes} distinct HGNC symbols. Whenever you reference the size of the gene set in your module summary or confidence score rationale, you must use the number {n_module_genes} verbatim. Lastly, your final response must fulfill the following exact criteria:
+Analyze the functional descriptions provided above and synthesize an annotation for this gene set. This gene set contains exactly {n_module_genes} distinct HGNC symbols. If you reference (this is not required) the size of the gene set in your module summary or confidence score rationale, you must use the number {n_module_genes} verbatim. Under no circumstances may you generate em-dashes in your response text; instead use a single hyphen if needed. Lastly, your final response must fulfill the following exact criteria:
 
 1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
 2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in your annotation.
@@ -279,7 +279,7 @@ Analyze the functional descriptions provided above and synthesize an annotation 
     )
     if add_latex_formatted_sumy:
         n_max_tokens_latex = max(500, n_max_tokens // 3)
-        latex_system_prompt = 'You are a precise text-formatting assistant. Your single task is to identify human gene symbols (HGNC symbols) within a text block and wrap them in LaTeX italicization formatting for usage in a scientific manuscript.'
+        latex_system_prompt = 'You are a precise LaTeX typesetting assistant. Your single task is to identify human gene symbols (HGNC symbols) within a text block and wrap them in LaTeX italicization formatting for usage in a scientific manuscript.'
         def format_latex(text_to_format: str) -> str:
             format_prompt = rf"""
             Please take the text block below, identify any HGNC symbols (e.g., STAT3, EGFR, IL6), 
