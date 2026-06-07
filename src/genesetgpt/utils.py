@@ -1,6 +1,6 @@
-import requests
 import xmltodict
 import numpy as np
+from curl_cffi import requests
 from typing import TypedDict, Optional
 
 def add_trailing_period(text: str) -> str:
@@ -60,15 +60,31 @@ def get_aliases(hgnc_symbol: str) -> GeneAliases:
         A dictionary containing the HGNC symbol, a list of it's known aliases / previous symbols (if any), and associated metadata. 
     """
     gene_url = f'https://rest.genenames.org/fetch/symbol/{hgnc_symbol}'
-    gene_page = requests.get(url=gene_url)
-    status_code = gene_page.status_code
+    headers = {
+        'Referer': 'https://www.genenames.org/',
+        'Accept': 'application/xml, text/xml, */*'
+    }
+    try:
+        gene_page = requests.get(
+            url=gene_url,
+            impersonate='chrome',
+            headers=headers,
+            timeout=15
+        )
+        status_code = gene_page.status_code
+    except Exception as e:
+        return {
+            'hgnc_symbol': hgnc_symbol,
+            'aliases': None,
+            'metadata': f'HGNC Network/CFFI Error: {str(e)}'
+        }
     if status_code != 200:
         res = {
-            'hgnc_symbol': hgnc_symbol, 
-            'aliases': None, 
+            'hgnc_symbol': hgnc_symbol,
+            'aliases': None,
             'metadata': f'Status code {status_code}'
         }
-    else: 
+    else:
         gene_xml = xmltodict.parse(xml_input=gene_page.text)
         arr_list = (
             gene_xml

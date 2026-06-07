@@ -106,7 +106,7 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
 
     Returns
     -------
-        A dictionary containing (if the request is successful) the Ensembl ID, corresponding UniProt ID, a list of UniProt functional summaries, and associated metadata. 
+        A dictionary containing the Ensembl ID, corresponding UniProt ID, a list of UniProt functional summaries, and associated metadata. 
 
     .. _UniProt canonical protein product: https://www.uniprot.org/uniprotkb
     """

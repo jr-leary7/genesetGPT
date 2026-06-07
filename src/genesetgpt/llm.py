@@ -238,7 +238,7 @@ Below are independently-generated descriptions for each of {n_module_genes} gene
 </gene_descriptions>
 
 # Instructions
-Analyze the functional descriptions provided above and synthesize an annotation for this gene set. This gene set contains exactly {n_module_genes} distinct HGNC symbols. Whenever you reference the size of the gene set in the module summary or confidence score rationale, you must use the number {n_module_genes} verbatim. Lastly, your final response must fulfill the following exact criteria:
+Analyze the functional descriptions provided above and synthesize an annotation for this gene set. This gene set contains exactly {n_module_genes} distinct HGNC symbols. Whenever you reference the size of the gene set in your module summary or confidence score rationale, you must use the number {n_module_genes} verbatim. Lastly, your final response must fulfill the following exact criteria:
 
 1. **Shared Function Summary**: Write a concise (5–7 sentences) paragraph summarizing the shared biological function(s) or pathway(s) of this gene set.
 2. **Confidence Score**: Provide a robust, 3-decimal score ranging from 0 to 1 estimating your overall confidence in your annotation.

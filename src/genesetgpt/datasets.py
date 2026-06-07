@@ -2,7 +2,7 @@ import importlib.resources as pkg_resources
 
 def load_example_gene_set():
     """
-    Loads a list of B-cell marker genes generated from the widely-used `10X Genomics PBMC3k scRNA-seq dataset`_.
+    Load a list of B-cell marker genes generated from the widely-used `10X Genomics PBMC3k scRNA-seq dataset`_.
     
     Returns
     -------

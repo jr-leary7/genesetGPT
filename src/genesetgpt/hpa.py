@@ -11,7 +11,7 @@ class HPAData(TypedDict):
 
 def fetch_HPA_data(ensembl_id: str) -> HPAData:
     """
-    Fetch a gene's related GO:BP terms & disease involvment from the `Human Protein Atlas`_. 
+    Fetch a gene's related GO:BP terms & disease involvements from the `Human Protein Atlas`_. 
 
     Parameters
     ----------
