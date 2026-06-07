@@ -59,7 +59,7 @@ def summarize_gene(prompt_user: str,
 You are an experienced computational biologist with advanced knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
 
 # Strict Constraints 
-In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the gene's function is nebulous or poorly-annotated.
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol e.g., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the gene's function is nebulous or poorly-annotated.
 """
     if provider == 'anthropic':
         llm_res = client.messages.parse(
@@ -138,7 +138,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
 You are an experienced computational biologist with extensive knowledge of next-generation sequencing analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
 
 # Strict Constraints 
-In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the gene's function is nebulous or poorly-annotated.
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol e.g., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the gene's function is nebulous or poorly-annotated.
 """
     summarize_all = partial(
         summarize_gene,
@@ -221,7 +221,7 @@ def summarize_module(module_genes: list,
 You are an experienced computational biologist with extensive knowledge of analyses such as GWAS, bulk and single cell RNA-seq, spatial 'omics, etc. When generating responses, you consider the statistical, computational, and biological angles of the question at hand. Your responses are detailed without being too overly technical. 
 
 # Strict Constraints 
-In all responses, do not utilize any means of referring to a gene other than its HGNC symbol i.e., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the module's genes have highly diverse or unclear functionalities.
+In all responses, do not utilize any means of referring to a gene other than its HGNC symbol e.g., never use 'Neurogranin' to refer to the gene NRGN. Do not include any information that is not explicitly present in the user prompt. Lastly, do not hesitate to express and quantify your uncertainty if the module's genes have highly diverse or unclear functionalities.
 """
     mask = gene_sumy_df['hgnc_symbol'].isin(values=module_genes)
     module_gene_ids = gene_sumy_df[mask].copy()
