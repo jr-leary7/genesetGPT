@@ -125,7 +125,7 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
 
     Returns
     -------
-        The inputted ``pd.DataFrame`` with three additional columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
+        The input ``pd.DataFrame`` with three additional new columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
     """
     provider = provider.lower()
     if provider not in ['anthropic', 'openai']:
@@ -204,7 +204,7 @@ def summarize_module(module_genes: list,
     n_max_tokens : ``int``
         An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene module. Defaults to 1500.
     add_latex_formatted_sumy : ``bool``
-        A Boolean specifying whether to add two additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is mainly useful for LaTeX-based manuscript preparation. Defaults to False.
+        A Boolean specifying whether to add two additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is primarily useful during LaTeX-based manuscript preparation. Defaults to False.
     
     Returns
     -------
@@ -278,7 +278,7 @@ Analyze the functional descriptions provided above and synthesize an annotation 
         index=[0]
     )
     if add_latex_formatted_sumy:
-        n_max_tokens_latex = max(500, n_max_tokens // 3)
+        n_max_tokens_latex = max(750, n_max_tokens // 2)
         latex_system_prompt = 'You are a precise LaTeX typesetting assistant. Your single task is to identify human gene symbols (HGNC symbols) within a text block and wrap them in LaTeX italicization formatting for usage in a scientific manuscript.'
         def format_latex(text_to_format: str) -> str:
             format_prompt = rf"""
