@@ -183,7 +183,8 @@ def summarize_module(module_genes: list,
                      client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
                      model: str = 'claude-haiku-4-5', 
                      n_max_tokens: int = 1500, 
-                     add_latex_formatted_sumy: bool = False) -> dict[str, Union[pd.DataFrame, str]]:
+                     add_latex_formatted_sumy: bool = False, 
+                     temperature: float = 1.0) -> dict[str, Union[pd.DataFrame, str]]:
     """
     Summarize a gene module based on previously-generated, unique LLM summaries of each gene in the module. 
 
@@ -205,6 +206,8 @@ def summarize_module(module_genes: list,
         An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene module. Defaults to 1500.
     add_latex_formatted_sumy : ``bool``
         A Boolean specifying whether to add two additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is primarily useful during LaTeX-based manuscript preparation. Defaults to False.
+    temperature : ``float``
+        A float ranging from 0-2 that controls the variability of the LLM-generated gene module summary. Higher values lead to more stochastic outputs, with lower values resulting in more deterministic responses. Defaults to 1.0.
     
     Returns
     -------
@@ -250,6 +253,7 @@ Analyze the functional descriptions provided above and synthesize an annotation 
             model=model, 
             max_tokens=n_max_tokens, 
             system=prompt_system, 
+            temperature=temperature,
             messages=[
                 {'role': 'user', 'content': summary_prompt}
             ], 
@@ -260,6 +264,7 @@ Analyze the functional descriptions provided above and synthesize an annotation 
         summary_response = client.responses.parse(
             model=model, 
             max_output_tokens=n_max_tokens,
+            temperature=temperature,
             input=[
                 {'role': 'developer', 'content': prompt_system}, 
                 {'role': 'user', 'content': summary_prompt}
