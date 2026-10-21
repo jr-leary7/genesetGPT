@@ -75,7 +75,7 @@ def clean_uniprot_summary(text: str) -> str:
     Parameters
     ----------
     text : ``str ``
-        A string containing the UniProt summary. Defaults to None. 
+        A string containing the UniProt summary. Defaults to ``None``. 
 
     Returns
     -------
@@ -102,7 +102,7 @@ def fetch_uniprot_summary(ensembl_id: str) -> UniProtSummary:
     Parameters
     ----------
     ensembl_id : ``str`` 
-        A string specifying the Ensembl ID of the gene of interest. Defaults to None.
+        A string specifying the Ensembl ID of the gene of interest. Defaults to ``None``.
 
     Returns
     -------
