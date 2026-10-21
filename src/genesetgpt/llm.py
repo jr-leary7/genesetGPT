@@ -3,10 +3,13 @@ import warnings
 import anthropic
 import numpy as np
 import pandas as pd
+from google import genai
 from typing import Union
 from tqdm.auto import tqdm
 from functools import partial
+from google.genai import types
 from pydantic import BaseModel
+from google.genai import errors
 from concurrent.futures import ThreadPoolExecutor
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 
@@ -16,14 +19,20 @@ class GeneSummary(BaseModel):
     confidence_score_rationale: str
 
 @retry(
-    retry=retry_if_exception_type(exception_types=(anthropic.RateLimitError, anthropic.APIConnectionError, openai.RateLimitError)),
+    retry=retry_if_exception_type(exception_types=(
+        anthropic.RateLimitError, 
+        anthropic.APIConnectionError, 
+        openai.RateLimitError, 
+        openai.APIConnectionError, 
+        errors.APIError
+    )),
     wait=wait_exponential(multiplier=1, min=2, max=10),
     stop=stop_after_attempt(max_attempt_number=5)
 )
 def summarize_gene(prompt_user: str, 
                    prompt_system: str, 
                    provider: str = 'anthropic', 
-                   client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
+                   client: Union[anthropic.Anthropic, openai.OpenAI, genai.Client] = None, 
                    model: str = 'claude-haiku-4-5', 
                    n_max_tokens: int = 500) -> tuple[str, float, str]:
     """
@@ -36,9 +45,9 @@ def summarize_gene(prompt_user: str,
     prompt_system : ``str``
         A string containing the system prompt.
     provider : ``str``
-        A string specifying the backend LLM provider to use. Must be one of 'anthropic' or 'openai'. Defaults to 'anthropic'.
-    client : ``Union[anthropic.Anthropic, openai.OpenAI]``
-        An object of class ``Anthropic`` or ``OpenAI`` generated with your API key. Defaults to None. 
+        A string specifying the backend LLM provider to use. Must be one of 'anthropic', 'openai', or 'gemini'. Defaults to 'anthropic'.
+    client : ``Union[anthropic.Anthropic, openai.OpenAI, genai.Client]``
+        An object of class ``Anthropic``, ``OpenAI``, or ``genai.Client`` generated with your API key. Defaults to ``None``. 
     model : ``str``
         A string specifying the specific LLM version to use when generating the response. Defaults to 'claude-haiku-4-5'. 
     n_max_tokens : ``int``
@@ -49,8 +58,8 @@ def summarize_gene(prompt_user: str,
         A tuple containing the gene-level summary, estimated confidence score, and confidence score rationale. 
     """
     provider = provider.lower()
-    if provider not in ['anthropic', 'openai']:
-        raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
+    if provider not in ['anthropic', 'openai', 'gemini']:
+        raise ValueError("Provider must be one of 'anthropic', 'openai', or 'gemini'.")
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
@@ -91,11 +100,27 @@ In all responses, do not utilize any means of referring to a gene other than its
             llm_res.output_parsed.confidence_score, 
             llm_res.output_parsed.confidence_score_rationale
         )
+    elif provider == 'gemini':
+        llm_res = client.models.generate_content(
+            model=model,
+            contents=prompt_user,
+            config=types.GenerateContentConfig(
+                system_instruction=prompt_system,
+                max_output_tokens=n_max_tokens,
+                response_mime_type='application/json',
+                response_schema=GeneSummary
+            )
+        )
+        res_tuple = (
+            llm_res.parsed.summary, 
+            llm_res.parsed.confidence_score, 
+            llm_res.parsed.confidence_score_rationale
+        )
     return res_tuple
 
 def summarize_individual_genes(user_prompt_df: pd.DataFrame, 
                                provider: str = 'anthropic', 
-                               client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
+                               client: Union[anthropic.Anthropic, openai.OpenAI, genai.Client] = None, 
                                model: str = 'claude-haiku-4-5', 
                                prompt_system: str = None, 
                                n_max_tokens: int = 500, 
@@ -109,27 +134,27 @@ def summarize_individual_genes(user_prompt_df: pd.DataFrame,
     user_prompt_df : ``pd.DataFrame``
         A ``pd.DataFrame`` containing a column named 'prompt_user' with the user prompts for each gene as constructed by the ``build_prompt_df()`` function.
     provider : ``str``
-        A string specifying the backend LLM provider to use. Must be one of 'anthropic' or 'openai'. Defaults to 'anthropic'.
-    client : ``Union[anthropic.Anthropic, openai.OpenAI]``
-        An object of class ``Anthropic`` or ``OpenAI`` generated with your API key. Defaults to None. 
+        A string specifying the backend LLM provider to use. Must be one of 'anthropic', 'openai', or 'gemini'. Defaults to 'anthropic'.
+    client : ``Union[anthropic.Anthropic, openai.OpenAI, genai.Client]``
+        An object of class ``Anthropic``, ``OpenAI``, or ``genai.Client`` generated with your API key. Defaults to ``None``. 
     model : ``str``
         A string specifying the specific LLM version to use when generating each response. Defaults to 'claude-haiku-4-5'. 
     prompt_system : ``str``
-        A string containing the system prompt specifying the LLM's role and additional biological context. Defaults to None.
+        A string containing the system prompt specifying the LLM's role and additional biological context. Defaults to ``None``.
     n_max_tokens : ``int``
         An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene. Defaults to 500.
     n_workers : ``int``
         An integer specifying the number of workers to use for parallel processing. Defaults to 8.
     progress_bar : ``bool``
-        A Boolean specifying whether to display a progress bar during per-gene summarization. Recommended for interactive notebook usage, but should probably be set to False for script usage. Defaults to True.
+        A Boolean specifying whether to display a progress bar during per-gene summarization. Recommended for interactive notebook usage, but should probably be set to ``False`` for script usage. Defaults to ``True``.
 
     Returns
     -------
         The input ``pd.DataFrame`` with three additional new columns containing each gene's LLM-generated functional summary, estimated confidence score, and confidence score rationale.
     """
     provider = provider.lower()
-    if provider not in ['anthropic', 'openai']:
-        raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
+    if provider not in ['anthropic', 'openai', 'gemini']:
+        raise ValueError("Provider must be one of 'anthropic', 'openai', or 'gemini'.")
     if client is None:
         raise ValueError('A client object initialized with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
@@ -180,13 +205,13 @@ def summarize_module(module_genes: list,
                      gene_sumy_df: pd.DataFrame, 
                      prompt_system: str = None, 
                      provider: str = 'anthropic', 
-                     client: Union[anthropic.Anthropic, openai.OpenAI] = None, 
+                     client: Union[anthropic.Anthropic, openai.OpenAI, genai.Client] = None, 
                      model: str = 'claude-haiku-4-5', 
                      n_max_tokens: int = 1500, 
                      add_latex_formatted_sumy: bool = False, 
                      temperature: float = 1.0) -> dict[str, Union[pd.DataFrame, str]]:
     """
-    Summarize a gene module based on previously-generated, unique LLM summaries of each gene in the module. 
+    Summarize a gene module based on previously-generated, annotation-based LLM summaries of each gene in the module. 
 
     Parameters
     ----------
@@ -195,17 +220,17 @@ def summarize_module(module_genes: list,
     gene_sumy_df : ``pd.DataFrame``
         A ``pd.DataFrame`` containing the previously-generated LLM summaries of each individual gene.
     prompt_system : ``str``
-        A string defining the system prompt that specifies the desired LLM role, along with additional biological context.
+        A string defining the system prompt that specifies the desired LLM role, along with additional biological context. Defaults to ``None``.
     provider : ``str``
-        A string specifying the backend LLM provider to use. Must be one of 'anthropic' or 'openai'. Defaults to 'anthropic'.
-    client : ``Union[anthropic.Anthropic, openai.OpenAI]``
-        An object of class ``Anthropic`` or ``OpenAI`` generated with your API key. Defaults to None. 
+        A string specifying the backend LLM provider to use. Must be one of 'anthropic', 'openai', or 'gemini'. Defaults to 'anthropic'.
+    client : ``Union[anthropic.Anthropic, openai.OpenAI, genai.Client]``
+        An object of class ``Anthropic``, ``OpenAI``, or ``genai.Client`` generated with your API key. Defaults to ``None``. 
     model : ``str``
         A string specifying the specific LLM to use when generating the response. Defaults to 'claude-haiku-4-5'. 
     n_max_tokens : ``int``
         An integer specifying the maximum number of output tokens used by the LLM when summarizing the gene module. Defaults to 1500.
     add_latex_formatted_sumy : ``bool``
-        A Boolean specifying whether to add two additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is primarily useful during LaTeX-based manuscript preparation. Defaults to False.
+        A Boolean specifying whether to add two additional columns containing LaTeX-formatted versions of the gene module summary and confidence score rationale to the generated ``pd.DataFrame`` gene module summary in the returned dictionary object. This is primarily useful during LaTeX-based manuscript preparation. Defaults to ``False``.
     temperature : ``float``
         A float ranging from 0-2 that controls the variability of the LLM-generated gene module summary. Higher values lead to more stochastic outputs, with lower values resulting in more deterministic responses. Defaults to 1.0.
     
@@ -214,8 +239,8 @@ def summarize_module(module_genes: list,
         A dictionary containing the gene module summary / name / confidence score / confidence score rationale formatted as a ``pd.DataFrame``, along with the raw LLM response's JSON output formatted as a string. 
     """
     provider = provider.lower()
-    if provider not in ['anthropic', 'openai']:
-        raise ValueError("Provider must be one of 'anthropic' or 'openai'.")
+    if provider not in ['anthropic', 'openai', 'gemini']:
+        raise ValueError("Provider must be one of 'anthropic', 'openai', or 'gemini'.")
     if client is None:
         raise ValueError('A client object generated with your API key must be passed to enable any LLM usage.')
     if prompt_system is None:
@@ -272,6 +297,19 @@ Analyze the functional descriptions provided above and synthesize an annotation 
             text_format=GeneSetSummary
         )
         parsed_data = summary_response.output_parsed
+    elif provider == 'gemini':
+        summary_response = client.models.generate_content(
+            model=model,
+            contents=summary_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=prompt_system,
+                max_output_tokens=n_max_tokens,
+                temperature=temperature,
+                response_mime_type='application/json',
+                response_schema=GeneSetSummary
+            )
+        )
+        parsed_data = summary_response.parsed
     model_json = parsed_data.model_dump_json()
     summary_df = pd.DataFrame(
         data={
@@ -317,6 +355,18 @@ Analyze the functional descriptions provided above and synthesize an annotation 
                     text_format=GeneSetSummaryLaTeX
                 )
                 raw_text = res.output_parsed.formatted_text
+            elif provider == 'gemini':
+                res = client.models.generate_content(
+                    model=model,
+                    contents=format_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=latex_system_prompt,
+                        max_output_tokens=n_max_tokens_latex,
+                        response_mime_type="application/json",
+                        response_schema=GeneSetSummaryLaTeX
+                    )
+                )
+                raw_text = res.parsed.formatted_text
             clean_text = raw_text.replace('\\\\', '\\')
             clean_text = clean_text.replace('\\%', '%').replace('%', '\\%')
             clean_text = clean_text.replace('\\&', '&').replace('&', '\\&')
