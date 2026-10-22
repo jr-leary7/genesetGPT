@@ -35,9 +35,9 @@ def build_user_prompt(ensembl_id: str,
     entrez_email : ``str``
         A string specifying your email address that will be associated with the Entrez query. 
     entrez_api_key : ``str``
-        A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
+        A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to ``None``.
     include_aliases : ``bool``
-        A Boolean specifying whether to include information concerning known HGNC gene symbol aliases in the user prompt. Defaults to True.
+        A Boolean specifying whether to include information concerning known HGNC gene symbol aliases in the user prompt. Defaults to ``True``.
 
     Returns
     -------
@@ -140,11 +140,11 @@ def build_prompt_df(gene_list: list,
     entrez_email : ``str``
         A string specifying your email address that will be associated with the Entrez query. 
     entrez_api_key : ``str``
-        A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to None.
+        A string specifying `your optional API key`_ for the Entrez database. Providing your key allows more API requests per second (10 versus 3). Defaults to ``None``.
     n_workers : ``int``
         An integer specifying the number of workers to use for parallel processing. Defaults to 6.
     progress_bar : ``bool``
-        A Boolean specifying whether to display a progress bar during user prompt generation. Recommended for interactive notebook usage, but should probably be set to False for script usage. Defaults to True.
+        A Boolean specifying whether to display a progress bar during user prompt generation. Recommended for interactive notebook usage, but should probably be set to ``False`` for script usage. Defaults to ``True``.
 
     Returns
     -------

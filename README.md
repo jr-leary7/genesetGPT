@@ -22,7 +22,7 @@ mkdir gene-set-analysis
 cd gene-set-analysis
 ```
 
-Next, intialize your `uv` project and create a virtual environment (named `.venv` by default), making sure to use our required minimum Python version:
+Next, intialize your `uv` project and create a virtual environment (named `.venv` by default), making sure to specify our required minimum Python version:
 
 ```bash
 uv init --python 3.12

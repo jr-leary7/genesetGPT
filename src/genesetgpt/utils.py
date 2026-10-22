@@ -3,20 +3,22 @@ import numpy as np
 from curl_cffi import requests
 from typing import TypedDict, Optional
 
-def add_trailing_period(text: str) -> str:
+def add_trailing_period(text: str = None) -> str:
     """
     Add a final period to a string. 
 
     Parameters
     ----------
     text : ``str``
-        A string to be edited. Defaults to None. 
+        A string to be edited. Defaults to ``None``. 
 
     Returns
     -------
     text : ``str``
         A string with a trailing period added if needed. 
     """
+    if text is None:
+            raise ValueError('Please pass a non-None string to be fornatted.')
     if not text.endswith('.'):
         return text + '.'
     return text
