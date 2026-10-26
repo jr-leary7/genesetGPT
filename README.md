@@ -75,9 +75,9 @@ anthropic_key = os.getenv('ANTHROPIC_API_KEY')
 
 Each LLM-based function in `genesetGPT` takes a string argument named `provider` that specifies whether to utilize an OpenAI (`'openai'`), Anthropic (`'anthropic'`), or Gemini (`'gemini'`) model. The model type itself is specified by the `model` string argument e.g., `model='claude-haiku-5-5'`. Each provider's available model lists & token pricing can be accessed at:
 
-    1. [OpenAI docs](https://developers.openai.com/api/docs/pricing)
-    2. [Anthropic docs](https://platform.claude.com/docs/en/models/overview)
-    3. [Gemini docs](https://ai.google.dev/gemini-api/docs/pricing)
+1. [OpenAI GPT docs](https://developers.openai.com/api/docs/pricing)
+2. [Anthropic Claude docs](https://platform.claude.com/docs/en/models/overview)
+3. [Google Gemini docs](https://ai.google.dev/gemini-api/docs/pricing)
 
 # Example usage
 
